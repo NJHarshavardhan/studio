@@ -19,6 +19,19 @@
       },
       "required": ["name", "email", "currentStage", "jobId"]
     },
+    "Job": {
+      "title": "Job Opening",
+      "description": "A job position available for applications.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "location": { "type": "string" },
+        "status": { "type": "string", "enum": ["Open", "Closed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "description", "status"]
+    },
     "InterviewSession": {
       "title": "Interview Session",
       "description": "A record of an AI-driven interview session.",
@@ -56,6 +69,10 @@
     "/candidates/{candidateId}": {
       "schema": "Candidate",
       "description": "Collection of candidates across all jobs."
+    },
+    "/jobs/{jobId}": {
+      "schema": "Job",
+      "description": "Collection of job openings."
     },
     "/interviews/{interviewId}": {
       "schema": "InterviewSession",

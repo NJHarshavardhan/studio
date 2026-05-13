@@ -1,7 +1,8 @@
+
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Users, Briefcase, Bot, CheckCircle2, TrendingUp, Clock } from "lucide-react";
+import { Users, Briefcase, Bot, CheckCircle2, TrendingUp, Clock, Loader2 } from "lucide-react";
 import { 
   BarChart, 
   Bar, 
@@ -13,6 +14,10 @@ import {
   AreaChart,
   Area
 } from 'recharts';
+import { useFirestore, useCollection } from "@/firebase";
+import { collection, query, orderBy, limit } from "firebase/firestore";
+import { useMemoFirebase } from "@/firebase";
+import { cn } from "@/lib/utils";
 
 const data = [
   { name: 'Mon', applications: 40, interviews: 24 },
@@ -24,19 +29,31 @@ const data = [
   { name: 'Sun', applications: 34, interviews: 43 },
 ];
 
-const stats = [
-  { title: "Total Candidates", value: "1,248", icon: Users, trend: "+12.5%", color: "text-blue-600", bg: "bg-blue-50" },
-  { title: "Active Jobs", value: "24", icon: Briefcase, trend: "+3 new", color: "text-indigo-600", bg: "bg-indigo-50" },
-  { title: "AI Interviews", value: "86", icon: Bot, trend: "+24 today", color: "text-purple-600", bg: "bg-purple-50" },
-  { title: "Hired", value: "12", icon: CheckCircle2, trend: "+2 this week", color: "text-emerald-600", bg: "bg-emerald-50" },
-];
-
 export default function Dashboard() {
+  const firestore = useFirestore();
+  
+  const { data: candidates } = useCollection(collection(firestore, "candidates"));
+  const { data: jobs } = useCollection(collection(firestore, "jobs"));
+  const { data: interviews } = useCollection(collection(firestore, "interviews"));
+
+  const recentReportsQuery = useMemoFirebase(() => {
+    return query(collection(firestore, "candidates"), orderBy("appliedDate", "desc"), limit(5));
+  }, [firestore]);
+  
+  const { data: recentCandidates, loading: loadingRecent } = useCollection(recentReportsQuery);
+
+  const stats = [
+    { title: "Total Candidates", value: candidates?.length || 0, icon: Users, trend: "+12.5%", color: "text-blue-600", bg: "bg-blue-50" },
+    { title: "Active Jobs", value: jobs?.length || 0, icon: Briefcase, trend: "+3 new", color: "text-indigo-600", bg: "bg-indigo-50" },
+    { title: "AI Interviews", value: interviews?.length || 0, icon: Bot, trend: "+24 today", color: "text-purple-600", bg: "bg-purple-50" },
+    { title: "Hired", value: candidates?.filter((c: any) => c.currentStage === "Selected").length || 0, icon: CheckCircle2, trend: "+2 this week", color: "text-emerald-600", bg: "bg-emerald-50" },
+  ];
+
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Dashboard</h1>
-        <p className="text-slate-500">Welcome back, here's what's happening today.</p>
+        <p className="text-slate-500">Welcome back, here's your recruitment overview powered by Firebase.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -115,34 +132,37 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
-              {[
-                { name: "Alex Rivera", job: "Senior React Engineer", score: 94, time: "2h ago" },
-                { name: "Sarah Chen", job: "Product Designer", score: 82, time: "4h ago" },
-                { name: "Michael Scott", job: "Regional Manager", score: 45, time: "6h ago" },
-              ].map((report) => (
-                <div key={report.name} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
+              {loadingRecent ? (
+                <div className="flex justify-center py-10">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                </div>
+              ) : recentCandidates?.map((report: any) => (
+                <div key={report.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500">
                       {report.name[0]}
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-slate-900">{report.name}</p>
-                      <p className="text-xs text-slate-500">{report.job}</p>
+                      <p className="text-xs text-slate-500">Candidate • {report.currentStage}</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <div className={cn(
                       "text-sm font-bold",
-                      report.score > 80 ? "text-emerald-600" : report.score > 60 ? "text-amber-600" : "text-red-600"
+                      report.matchScore > 80 ? "text-emerald-600" : report.matchScore > 60 ? "text-amber-600" : "text-red-600"
                     )}>
-                      {report.score}% Match
+                      {report.matchScore}% Match
                     </div>
                     <div className="text-[10px] text-slate-400 flex items-center justify-end gap-1">
-                      <Clock className="h-2 w-2" /> {report.time}
+                      <Clock className="h-2 w-2" /> {new Date(report.appliedDate).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
               ))}
+              {recentCandidates?.length === 0 && (
+                <p className="text-center py-10 text-slate-400 italic text-sm">No recent matches to display.</p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -152,22 +172,22 @@ export default function Dashboard() {
             <CardTitle className="text-lg">Quick Tasks</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-             <div className="flex items-start gap-3 p-3 rounded-lg border border-dashed hover:border-primary cursor-pointer transition-colors group">
+             <div onClick={() => window.location.href='/dashboard/jobs'} className="flex items-start gap-3 p-3 rounded-lg border border-dashed hover:border-primary cursor-pointer transition-colors group">
                <div className="p-2 rounded bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white">
                  <Briefcase className="h-4 w-4" />
                </div>
                <div>
                  <p className="text-sm font-medium">Create Job Opening</p>
-                 <p className="text-xs text-slate-500">Post a new role to boards</p>
+                 <p className="text-xs text-slate-500">Post a new role to your board</p>
                </div>
              </div>
-             <div className="flex items-start gap-3 p-3 rounded-lg border border-dashed hover:border-primary cursor-pointer transition-colors group">
+             <div onClick={() => window.location.href='/dashboard/screening'} className="flex items-start gap-3 p-3 rounded-lg border border-dashed hover:border-primary cursor-pointer transition-colors group">
                <div className="p-2 rounded bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white">
                  <Bot className="h-4 w-4" />
                </div>
                <div>
-                 <p className="text-sm font-medium">Setup AI Interview</p>
-                 <p className="text-xs text-slate-500">Configure questions for JD</p>
+                 <p className="text-sm font-medium">Setup AI Screening</p>
+                 <p className="text-xs text-slate-500">Configure AI resume matching</p>
                </div>
              </div>
           </CardContent>
@@ -175,8 +195,4 @@ export default function Dashboard() {
       </div>
     </div>
   );
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(' ');
 }
