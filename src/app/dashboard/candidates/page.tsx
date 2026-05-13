@@ -13,14 +13,15 @@ import {
   Video, 
   CheckCircle2, 
   UserPlus,
-  Mail,
   Send,
   Loader2
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, query, updateDoc, doc } from "firebase/firestore";
+import { collection, updateDoc, doc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 import type { Candidate, PipelineStage } from "@/lib/types";
 
 const STAGES: PipelineStage[] = [
@@ -45,27 +46,29 @@ export default function CandidatesPipeline() {
     c.email?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
-  const handleSendInterviewRequest = async (candidateId: string, email: string) => {
+  const handleSendInterviewRequest = (candidateId: string, email: string) => {
     if (!firestore) return;
     
-    try {
-      const cRef = doc(firestore, "candidates", candidateId);
-      await updateDoc(cRef, {
-        interviewStatus: "sent",
-        currentStage: "AI Interview"
+    const cRef = doc(firestore, "candidates", candidateId);
+    const updateData = {
+      interviewStatus: "sent",
+      currentStage: "AI Interview"
+    };
+
+    updateDoc(cRef, updateData)
+      .catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: cRef.path,
+          operation: 'update',
+          requestResourceData: updateData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
       });
-      
-      toast({
-        title: "Interview Request Sent",
-        description: `An AI interview link has been sent to ${email}.`,
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update candidate status.",
-      });
-    }
+    
+    toast({
+      title: "Interview Request Sent",
+      description: `An AI interview link has been sent to ${email}.`,
+    });
   };
 
   if (loading) {

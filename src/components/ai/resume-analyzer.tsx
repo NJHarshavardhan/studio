@@ -1,16 +1,19 @@
+
 "use client"
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { FileUp, Loader2, CheckCircle2, AlertCircle, Mail, Phone, User, Calendar } from "lucide-react";
+import { FileUp, Loader2, CheckCircle2, AlertCircle, Mail, Phone, Calendar } from "lucide-react";
 import { aiResumeMatcherAndAnalyzer, type AiResumeMatcherAndAnalyzerOutput } from "@/ai/flows/ai-resume-matcher-and-analyzer";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { useFirestore } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 interface ResumeAnalyzerProps {
   jobDescription: string;
@@ -67,42 +70,46 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
     }
   };
 
-  const handleApprove = async () => {
+  const handleApprove = () => {
     if (!result || !firestore) return;
     setIsApproving(true);
 
-    try {
-      const candidateData = {
-        name: result.extractedInfo.name,
-        email: result.extractedInfo.email,
-        phone: result.extractedInfo.phone,
-        yearsOfExperience: result.extractedInfo.yearsOfExperience,
-        matchScore: result.matchScore,
-        currentStage: "Shortlisted",
-        jobId: "default-job-id", // In a real app, this would be passed as a prop
-        resumeDataUri: result.resumeDataUri,
-        appliedDate: new Date().toISOString(),
-        interviewStatus: "none",
-        createdAt: serverTimestamp()
-      };
+    const candidateData = {
+      name: result.extractedInfo.name,
+      email: result.extractedInfo.email,
+      phone: result.extractedInfo.phone,
+      yearsOfExperience: result.extractedInfo.yearsOfExperience,
+      matchScore: result.matchScore,
+      currentStage: "Shortlisted",
+      jobId: "default-job-id",
+      resumeDataUri: result.resumeDataUri,
+      appliedDate: new Date().toISOString(),
+      interviewStatus: "none",
+      createdAt: serverTimestamp()
+    };
 
-      await addDoc(collection(firestore, "candidates"), candidateData);
-      
-      toast({
-        title: "Candidate Approved",
-        description: `${result.extractedInfo.name} has been added to the shortlist.`,
+    const candidatesCol = collection(firestore, "candidates");
+
+    addDoc(candidatesCol, candidateData)
+      .catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: candidatesCol.path,
+          operation: 'create',
+          requestResourceData: candidateData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
       });
-      
-      router.push("/dashboard/candidates");
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not save candidate data.",
-      });
-    } finally {
-      setIsApproving(false);
-    }
+
+    toast({
+      title: "Candidate Approved",
+      description: `${result.extractedInfo.name} has been added to the shortlist.`,
+    });
+    
+    // Non-blocking redirect
+    router.push("/dashboard/candidates");
+    
+    // Handle loading state quickly for better UX
+    setTimeout(() => setIsApproving(false), 500);
   };
 
   const handleDecline = () => {
@@ -176,7 +183,7 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
                    </div>
                  </div>
                  <div className="flex gap-2">
-                   <Button variant="outline" onClick={handleDecline}>Decline</Button>
+                   <Button variant="outline" onClick={handleDecline} disabled={isApproving}>Decline</Button>
                    <Button onClick={handleApprove} disabled={isApproving}>
                      {isApproving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
                      Approve & Add to List

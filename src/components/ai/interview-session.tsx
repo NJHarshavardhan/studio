@@ -1,26 +1,34 @@
+
 "use client"
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Bot, User, Send, Loader2, CheckCircle2, MessageSquare } from "lucide-react";
+import { Bot, User, Send, CheckCircle2, MessageSquare } from "lucide-react";
 import { dynamicAIInterviewAndEvaluation, type DynamicAIInterviewOutput } from "@/ai/flows/dynamic-ai-interview-and-evaluation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { useFirestore } from "@/firebase";
+import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 interface InterviewSessionProps {
   jobDescription: string;
   resumeText: string;
+  candidateId?: string;
+  jobId?: string;
 }
 
-export function InterviewSession({ jobDescription, resumeText }: InterviewSessionProps) {
+export function InterviewSession({ jobDescription, resumeText, candidateId, jobId = "default-job-id" }: InterviewSessionProps) {
   const [messages, setMessages] = useState<{ role: 'user' | 'model', content: string }[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [report, setReport] = useState<DynamicAIInterviewOutput | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const firestore = useFirestore();
 
   useEffect(() => {
     if (messages.length === 0) {
@@ -71,6 +79,40 @@ export function InterviewSession({ jobDescription, resumeText }: InterviewSessio
       if (response.interviewCompleted) {
         setIsCompleted(true);
         setReport(response);
+
+        // Save session data to Firestore if candidateId is present
+        if (candidateId && firestore) {
+          const interviewsCol = collection(firestore, "interviews");
+          const interviewData = {
+            candidateId,
+            jobId,
+            status: "completed",
+            score: response.interviewScore || 0,
+            summary: response.interviewSummary || "",
+            transcript: response.transcript || updatedHistory.map(m => `${m.role}: ${m.content}`).join('\n'),
+            completedAt: new Date().toISOString()
+          };
+
+          addDoc(interviewsCol, interviewData).catch(async (e) => {
+            errorEmitter.emit('permission-error', new FirestorePermissionError({
+              path: interviewsCol.path,
+              operation: 'create',
+              requestResourceData: interviewData
+            }));
+          });
+
+          // Update candidate status
+          const candidateRef = doc(firestore, "candidates", candidateId);
+          updateDoc(candidateRef, {
+            currentStage: "HR Review",
+            interviewStatus: "completed"
+          }).catch(async (e) => {
+            errorEmitter.emit('permission-error', new FirestorePermissionError({
+              path: candidateRef.path,
+              operation: 'update'
+            }));
+          });
+        }
       } else if (response.nextQuestion) {
         setMessages(prev => [...prev, { role: 'model', content: response.nextQuestion! }]);
       }
@@ -108,7 +150,7 @@ export function InterviewSession({ jobDescription, resumeText }: InterviewSessio
 
           <div className="pt-4">
             <Button className="w-full" variant="outline" onClick={() => window.location.reload()}>
-              Start New Session
+              Close Session
             </Button>
           </div>
         </CardContent>
@@ -117,7 +159,7 @@ export function InterviewSession({ jobDescription, resumeText }: InterviewSessio
   }
 
   return (
-    <Card className="max-w-3xl mx-auto h-[700px] flex flex-col border-none shadow-xl bg-white overflow-hidden">
+    <Card className="max-w-3xl mx-auto h-[600px] flex flex-col border-none shadow-xl bg-white overflow-hidden">
       <CardHeader className="border-b bg-slate-50 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

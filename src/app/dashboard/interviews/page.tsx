@@ -1,13 +1,28 @@
+
 "use client"
 
+import { useMemo } from "react";
 import { InterviewSession } from "@/components/ai/interview-session";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Video, Bot, Clock, ExternalLink } from "lucide-react";
+import { Bot, Clock, ExternalLink, Loader2 } from "lucide-react";
+import { useFirestore, useCollection } from "@/firebase";
+import { collection, query, orderBy } from "firebase/firestore";
+import { useMemoFirebase } from "@/firebase";
+import { cn } from "@/lib/utils";
 
 export default function InterviewsPage() {
+  const firestore = useFirestore();
+  
+  const interviewsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, "interviews"), orderBy("completedAt", "desc"));
+  }, [firestore]);
+
+  const { data: interviews, loading } = useCollection(interviewsQuery);
+
   const jd = "Senior Product Designer with experience in SaaS dashboards and design systems.";
   const resume = "Product Designer with 8 years of experience building scalable design systems for HR platforms.";
 
@@ -18,10 +33,10 @@ export default function InterviewsPage() {
         <p className="text-slate-500">Manage and monitor automated candidate interviews.</p>
       </div>
 
-      <Tabs defaultValue="live" className="w-full">
+      <Tabs defaultValue="sessions" className="w-full">
         <TabsList className="grid w-full grid-cols-2 max-w-md bg-white border">
-          <TabsTrigger value="live">Live Simulation</TabsTrigger>
           <TabsTrigger value="sessions">Past Sessions</TabsTrigger>
+          <TabsTrigger value="live">Live Simulation</TabsTrigger>
         </TabsList>
         <TabsContent value="live" className="pt-6">
           <div className="bg-slate-50 rounded-2xl p-8 border-2 border-dashed">
@@ -35,60 +50,63 @@ export default function InterviewsPage() {
         </TabsContent>
         <TabsContent value="sessions" className="pt-6">
           <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-            <Table>
-              <TableHeader className="bg-slate-50">
-                <TableRow>
-                  <TableHead>Candidate</TableHead>
-                  <TableHead>Job Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Score</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {[
-                  { name: "John Doe", role: "Software Engineer", status: "Completed", score: 88, date: "2024-05-15" },
-                  { name: "Jane Smith", role: "UI Designer", status: "In Progress", score: null, date: "2024-05-16" },
-                  { name: "Mike Jones", role: "Product Manager", status: "Completed", score: 42, date: "2024-05-14" },
-                ].map((s, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="font-medium">{s.name}</TableCell>
-                    <TableCell>{s.role}</TableCell>
-                    <TableCell>
-                      <Badge variant={s.status === "Completed" ? "secondary" : "outline"} className={s.status === "Completed" ? "bg-emerald-50 text-emerald-700" : "bg-blue-50 text-blue-700"}>
-                        {s.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {s.score ? (
+            {loading ? (
+              <div className="flex justify-center p-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <Table>
+                <TableHeader className="bg-slate-50">
+                  <TableRow>
+                    <TableHead>Session ID</TableHead>
+                    <TableHead>Job Role</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Score</TableHead>
+                    <TableHead>Completed Date</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {interviews?.map((session: any) => (
+                    <TableRow key={session.id}>
+                      <TableCell className="font-medium truncate max-w-[150px]">{session.id}</TableCell>
+                      <TableCell>Software Engineer</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="bg-emerald-50 text-emerald-700">
+                          Completed
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
                         <span className={cn(
                           "font-bold",
-                          s.score > 80 ? "text-emerald-600" : s.score > 60 ? "text-amber-600" : "text-red-600"
-                        )}>{s.score}/100</span>
-                      ) : "-"}
-                    </TableCell>
-                    <TableCell className="text-slate-500 text-sm">
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" /> {s.date}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">
-                        <ExternalLink className="h-4 w-4 mr-2" /> View Report
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                          session.score > 80 ? "text-emerald-600" : session.score > 60 ? "text-amber-600" : "text-red-600"
+                        )}>{session.score}/100</span>
+                      </TableCell>
+                      <TableCell className="text-slate-500 text-sm">
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" /> {new Date(session.completedAt).toLocaleDateString()}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm">
+                          <ExternalLink className="h-4 w-4 mr-2" /> View Report
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {interviews?.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-12 text-slate-500 italic">
+                        No completed interview sessions found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            )}
           </div>
         </TabsContent>
       </Tabs>
     </div>
   );
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(' ');
 }
