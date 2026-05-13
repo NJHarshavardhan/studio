@@ -24,6 +24,10 @@ export type AiResumeMatcherAndAnalyzerInput = z.infer<typeof AiResumeMatcherAndA
 // Output Schema
 const AiResumeMatcherAndAnalyzerOutputSchema = z.object({
   extractedInfo: z.object({
+    name: z.string().describe('The candidate\'s full name.'),
+    email: z.string().describe('The candidate\'s email address.'),
+    phone: z.string().describe('The candidate\'s phone number.'),
+    yearsOfExperience: z.number().describe('The total number of years of professional experience.'),
     skills: z.array(z.string()).describe('A list of key skills extracted from the resume.'),
     experience: z
       .string()
@@ -70,7 +74,7 @@ const prompt = ai.definePrompt({
   name: 'aiResumeMatcherAndAnalyzerPrompt',
   input: {schema: AiResumeMatcherAndAnalyzerInputSchema},
   output: {schema: AiResumeMatcherAndAnalyzerOutputSchema},
-  prompt: `You are an expert HR analyst and recruitment AI. Your task is to meticulously analyze a candidate's resume and compare it against a provided job description.\n\nCarefully extract the requested information from the resume and then perform a thorough comparison with the job description.\n\n**Job Description:**\n{{{jobDescription}}}\n\n**Candidate Resume:**\n{{media url=resumeDataUri}}\n\nBased on the resume and the job description, perform the following:\n1.  **Extract Information from Resume**: Identify and list key skills, summarize work experience, list technologies, and summarize education. Also, create a concise professional summary for the candidate.\n2.  **Identify Strengths and Weaknesses**: Based on the candidate's profile, identify their main professional strengths and potential weaknesses or areas for development relevant to a typical professional role.\n3.  **Calculate Match Score**: Determine a percentage match score (0-100) indicating how well the candidate's resume aligns with the requirements outlined in the job description. Consider skills, experience, and other relevant criteria.\n4.  **Perform Skill Gap Analysis**: Identify any critical skills mentioned in the job description that are either completely missing from the resume or where the candidate's experience seems weak or insufficient. For each gap, provide a brief reason.\n\nProvide your output in a structured JSON format according to the provided schema.`,
+  prompt: `You are an expert HR analyst and recruitment AI. Your task is to meticulously analyze a candidate's resume and compare it against a provided job description.\n\nCarefully extract the requested information from the resume and then perform a thorough comparison with the job description.\n\n**Job Description:**\n{{{jobDescription}}}\n\n**Candidate Resume:**\n{{media url=resumeDataUri}}\n\nBased on the resume and the job description, perform the following:\n1.  **Extract Information from Resume**: Identify and list the candidate's name, email, phone number, total years of experience, key skills, summarize work experience, list technologies, and summarize education. Also, create a concise professional summary for the candidate.\n2.  **Identify Strengths and Weaknesses**: Based on the candidate's profile, identify their main professional strengths and potential weaknesses or areas for development relevant to a typical professional role.\n3.  **Calculate Match Score**: Determine a percentage match score (0-100) indicating how well the candidate's resume aligns with the requirements outlined in the job description. Consider skills, experience, and other relevant criteria.\n4.  **Perform Skill Gap Analysis**: Identify any critical skills mentioned in the job description that are either completely missing from the resume or where the candidate's experience seems weak or insufficient. For each gap, provide a brief reason.\n\nProvide your output in a structured JSON format according to the provided schema.`,
 });
 
 const aiResumeMatcherAndAnalyzerFlow = ai.defineFlow(

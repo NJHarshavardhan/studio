@@ -1,0 +1,50 @@
+{
+  "entities": {
+    "Candidate": {
+      "title": "Candidate",
+      "description": "Information about a job candidate extracted from a resume or provided during application.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "yearsOfExperience": { "type": "number" },
+        "matchScore": { "type": "number" },
+        "currentStage": { "type": "string", "enum": ["Applied", "AI Screening", "Shortlisted", "AI Interview", "HR Review", "Selected", "Rejected"] },
+        "jobId": { "type": "string" },
+        "resumeDataUri": { "type": "string" },
+        "appliedDate": { "type": "string", "format": "date-time" },
+        "interviewStatus": { "type": "string", "enum": ["none", "sent", "completed"] }
+      },
+      "required": ["name", "email", "currentStage", "jobId"]
+    },
+    "InterviewSession": {
+      "title": "Interview Session",
+      "description": "A record of an AI-driven interview session.",
+      "type": "object",
+      "properties": {
+        "candidateId": { "type": "string" },
+        "jobId": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "completed"] },
+        "score": { "type": "number" },
+        "summary": { "type": "string" },
+        "transcript": { "type": "string" },
+        "completedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["candidateId", "jobId", "status"]
+    }
+  },
+  "auth": {
+    "providers": ["google.com", "password"]
+  },
+  "firestore": {
+    "/candidates/{candidateId}": {
+      "schema": "Candidate",
+      "description": "Collection of candidates across all jobs."
+    },
+    "/interviews/{interviewId}": {
+      "schema": "InterviewSession",
+      "description": "Logs of AI interview sessions."
+    }
+  }
+}
