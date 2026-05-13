@@ -24,43 +24,43 @@ export type AiResumeMatcherAndAnalyzerInput = z.infer<typeof AiResumeMatcherAndA
 // Output Schema
 const AiResumeMatcherAndAnalyzerOutputSchema = z.object({
   extractedInfo: z.object({
-    name: z.string().describe('The candidate\'s full name.'),
-    email: z.string().describe('The candidate\'s email address.'),
-    phone: z.string().describe('The candidate\'s phone number.'),
-    yearsOfExperience: z.number().describe('The total number of years of professional experience.'),
+    name: z.string().describe("The candidate's full name."),
+    email: z.string().describe("The candidate's email address."),
+    phone: z.string().describe("The candidate's phone number."),
+    yearsOfExperience: z.coerce.number().describe('The total number of years of professional experience as a number (e.g. 5).'),
     skills: z.array(z.string()).describe('A list of key skills extracted from the resume.'),
     experience: z
       .string()
-      .describe('A summarized overview of the candidate\'s work experience from the resume.'),
+      .describe("A summarized overview of the candidate's work experience from the resume."),
     technologies: z
       .array(z.string())
       .describe('A list of technologies mentioned in the resume.'),
-    education: z.string().describe('A summarized overview of the candidate\'s education.'),
+    education: z.string().describe("A summarized overview of the candidate's education."),
     candidateSummary: z
       .string()
-      .describe('A concise summary of the candidate\'s professional profile.'),
+      .describe("A concise summary of the candidate's professional profile."),
     strengths: z
       .array(z.string())
-      .describe('A list of the candidate\'s key strengths relevant to the job market.'),
+      .describe("A list of the candidate's key strengths relevant to the job market."),
     weaknesses: z
       .array(z.string())
-      .describe('A list of potential weaknesses or areas for improvement based on the resume.'),
+      .describe("A list of potential weaknesses or areas for improvement based on the resume."),
   }),
-  matchScore: z
+  matchScore: z.coerce
     .number()
     .min(0)
     .max(100)
-    .describe('A percentage score indicating how well the candidate\'s resume matches the job description.'),
+    .describe("A percentage score (0-100) indicating how well the resume matches the job description."),
   skillGapAnalysis: z
     .array(
       z.object({
         skill: z.string().describe('A skill required by the job description.'),
         reason: z
           .string()
-          .describe('Explanation why this skill is a gap for the candidate (e.g., missing, limited experience).'),
+          .describe('Explanation why this skill is a gap for the candidate.'),
       })
     )
-    .describe('An analysis of skills present in the job description but missing or weak in the candidate\'s resume.'),
+    .describe('An analysis of skills present in the job description but missing or weak in the resume.'),
 });
 export type AiResumeMatcherAndAnalyzerOutput = z.infer<typeof AiResumeMatcherAndAnalyzerOutputSchema>;
 
@@ -74,7 +74,21 @@ const prompt = ai.definePrompt({
   name: 'aiResumeMatcherAndAnalyzerPrompt',
   input: {schema: AiResumeMatcherAndAnalyzerInputSchema},
   output: {schema: AiResumeMatcherAndAnalyzerOutputSchema},
-  prompt: `You are an expert HR analyst and recruitment AI. Your task is to meticulously analyze a candidate's resume and compare it against a provided job description.\n\nCarefully extract the requested information from the resume and then perform a thorough comparison with the job description.\n\n**Job Description:**\n{{{jobDescription}}}\n\n**Candidate Resume:**\n{{media url=resumeDataUri}}\n\nBased on the resume and the job description, perform the following:\n1.  **Extract Information from Resume**: Identify and list the candidate's name, email, phone number, total years of experience, key skills, summarize work experience, list technologies, and summarize education. Also, create a concise professional summary for the candidate.\n2.  **Identify Strengths and Weaknesses**: Based on the candidate's profile, identify their main professional strengths and potential weaknesses or areas for development relevant to a typical professional role.\n3.  **Calculate Match Score**: Determine a percentage match score (0-100) indicating how well the candidate's resume aligns with the requirements outlined in the job description. Consider skills, experience, and other relevant criteria.\n4.  **Perform Skill Gap Analysis**: Identify any critical skills mentioned in the job description that are either completely missing from the resume or where the candidate's experience seems weak or insufficient. For each gap, provide a brief reason.\n\nProvide your output in a structured JSON format according to the provided schema.`,
+  prompt: `You are an expert HR analyst and recruitment AI. Your task is to meticulously analyze a candidate's resume and compare it against a provided job description.
+
+**CRITICAL INSTRUCTIONS:**
+- You MUST extract the name, email, and phone number exactly as they appear.
+- For "yearsOfExperience", return ONLY the number. If they have 5.5 years, return 5.5.
+- For "matchScore", return a number between 0 and 100.
+- If certain information is missing (like phone), return "Not provided".
+
+**Job Description:**
+{{{jobDescription}}}
+
+**Candidate Resume:**
+{{media url=resumeDataUri}}
+
+Based on the resume and the job description, perform a thorough analysis and provide your output in the requested JSON structure.`,
 });
 
 const aiResumeMatcherAndAnalyzerFlow = ai.defineFlow(
@@ -84,10 +98,15 @@ const aiResumeMatcherAndAnalyzerFlow = ai.defineFlow(
     outputSchema: AiResumeMatcherAndAnalyzerOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    if (!output) {
-      throw new Error('Failed to generate resume analysis output.');
+    try {
+      const {output} = await prompt(input);
+      if (!output) {
+        throw new Error('AI model failed to generate a response.');
+      }
+      return output;
+    } catch (error) {
+      console.error('Error in aiResumeMatcherAndAnalyzerFlow:', error);
+      throw error;
     }
-    return output;
   }
 );

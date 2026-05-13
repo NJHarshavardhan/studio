@@ -48,11 +48,12 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
             title: "Analysis Complete",
             description: `Candidate matched with a score of ${analysis.matchScore}%`,
           });
-        } catch (error) {
+        } catch (error: any) {
+          console.error('Resume Analysis Error:', error);
           toast({
             variant: "destructive",
-            title: "Error",
-            description: "Failed to analyze resume. Please try again.",
+            title: "Analysis Failed",
+            description: error.message || "Failed to analyze resume. Please try again with a different file.",
           });
         } finally {
           setIsAnalyzing(false);
@@ -64,7 +65,7 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "An unexpected error occurred.",
+        description: "An unexpected error occurred reading the file.",
       });
     }
   };
@@ -162,7 +163,7 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                  <div className="flex items-center gap-4">
                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl">
-                     {result.extractedInfo.name[0]}
+                     {result.extractedInfo.name[0] || 'C'}
                    </div>
                    <div>
                      <CardTitle className="text-xl">{result.extractedInfo.name}</CardTitle>
@@ -213,7 +214,7 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
                       <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Strengths</h4>
                       <div className="flex flex-wrap gap-2">
                         {result.extractedInfo.strengths.map((s, idx) => (
-                          <Badge key={`${s}-${idx}`} variant="secondary" className="bg-emerald-50 text-emerald-700 border-none">{s}</Badge>
+                          <Badge key={`strength-${idx}-${s}`} variant="secondary" className="bg-emerald-50 text-emerald-700 border-none">{s}</Badge>
                         ))}
                       </div>
                     </div>
@@ -225,7 +226,7 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
                       <div className="space-y-3">
                         {result.skillGapAnalysis.length > 0 ? (
                           result.skillGapAnalysis.map((gap, i) => (
-                            <div key={`gap-${i}`} className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100">
+                            <div key={`gap-${i}-${gap.skill}`} className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100">
                               <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5" />
                               <div>
                                 <p className="text-sm font-semibold text-slate-900">{gap.skill}</p>
@@ -246,7 +247,7 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
                       <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Key Technologies</h4>
                       <div className="flex flex-wrap gap-2">
                         {result.extractedInfo.technologies.map((t, idx) => (
-                          <Badge key={`${t}-${idx}`} variant="outline" className="text-blue-600 border-blue-200 bg-blue-50/50">{t}</Badge>
+                          <Badge key={`tech-${idx}-${t}`} variant="outline" className="text-blue-600 border-blue-200 bg-blue-50/50">{t}</Badge>
                         ))}
                       </div>
                     </div>
