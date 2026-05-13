@@ -15,7 +15,8 @@ import {
   UserPlus,
   Send,
   Loader2,
-  Mail
+  Copy,
+  Check
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useFirestore, useCollection } from "@/firebase";
@@ -38,6 +39,7 @@ const STAGES: PipelineStage[] = [
 export default function CandidatesPipeline() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSendingMail, setIsSendingMail] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const firestore = useFirestore();
   const { toast } = useToast();
   
@@ -49,13 +51,23 @@ export default function CandidatesPipeline() {
     c.email?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
+  const handleCopyLink = (candidateId: string) => {
+    const url = `${window.location.origin}/interview/${candidateId}`;
+    navigator.clipboard.writeText(url);
+    setCopiedId(candidateId);
+    toast({
+      title: "Link Copied",
+      description: "Candidate interview link is now in your clipboard.",
+    });
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
   const handleSendInterviewRequest = async (candidate: any) => {
     if (!firestore) return;
     
     setIsSendingMail(candidate.id);
     
     try {
-      // 1. Trigger the AI Email Flow (Server Side)
       const emailResult = await sendRecruitmentEmail({
         candidateName: candidate.name,
         candidateEmail: candidate.email,
@@ -63,7 +75,6 @@ export default function CandidatesPipeline() {
         jobTitle: 'Senior Developer'
       });
 
-      // 2. Log the email to Firestore (Internal Messaging Center)
       const emailsCol = collection(firestore, "emails");
       addDoc(emailsCol, {
         candidateEmail: candidate.email,
@@ -79,7 +90,6 @@ export default function CandidatesPipeline() {
          }));
       });
 
-      // 3. Update Candidate Status
       const cRef = doc(firestore, "candidates", candidate.id);
       const updateData = {
         interviewStatus: "sent",
@@ -88,23 +98,22 @@ export default function CandidatesPipeline() {
 
       updateDoc(cRef, updateData)
         .catch(async (serverError) => {
-          const permissionError = new FirestorePermissionError({
+          errorEmitter.emit('permission-error', new FirestorePermissionError({
             path: cRef.path,
             operation: 'update',
             requestResourceData: updateData,
-          });
-          errorEmitter.emit('permission-error', permissionError);
+          }));
         });
       
       toast({
-        title: "Interview Request Sent",
-        description: `Check the Messages tab to view the AI-generated invite for ${candidate.email}.`,
+        title: "AI Interview Requested",
+        description: "Candidate status updated. You can now copy the link below.",
       });
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Process Failed",
-        description: "Could not generate or send the recruitment email.",
+        description: "Could not generate recruitment email context.",
       });
     } finally {
       setIsSendingMail(null);
@@ -189,13 +198,27 @@ export default function CandidatesPipeline() {
                            }}
                          >
                            {isSendingMail === candidate.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3 mr-1" />}
-                           {isSendingMail === candidate.id ? "Sending..." : "Request AI Interview"}
+                           {isSendingMail === candidate.id ? "Processing..." : "Move to AI Interview"}
                          </Button>
                       )}
 
-                      {stage === "AI Interview" && candidate.interviewStatus === "sent" && (
-                        <div className="flex items-center gap-1.5 mt-2 text-[10px] text-amber-600 font-medium italic">
-                          <Video className="h-3 w-3" /> Waiting for response...
+                      {stage === "AI Interview" && (
+                        <div className="space-y-2 mt-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="w-full h-7 text-[10px] bg-emerald-50 text-emerald-700 border-emerald-100"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCopyLink(candidate.id);
+                            }}
+                          >
+                            {copiedId === candidate.id ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
+                            {copiedId === candidate.id ? "Copied!" : "Copy Interview Link"}
+                          </Button>
+                          <div className="flex items-center gap-1.5 text-[10px] text-amber-600 font-medium italic">
+                            <Video className="h-3 w-3" /> Waiting for response...
+                          </div>
                         </div>
                       )}
 
