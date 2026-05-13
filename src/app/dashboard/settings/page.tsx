@@ -84,7 +84,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label>Auto-invite candidates</Label>
-                <p className="text-xs text-slate-500">Automatically send AI interview links to matches > 80%</p>
+                <p className="text-xs text-slate-500">Automatically send AI interview links to matches &gt; 80%</p>
               </div>
               <Switch defaultChecked />
             </div>
