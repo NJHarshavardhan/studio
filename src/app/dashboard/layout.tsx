@@ -18,7 +18,7 @@ export default function DashboardLayout({
             <div className="bg-primary p-1 rounded-md">
               <Bot className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-lg tracking-tight">HirePulse</span>
+            <span className="font-bold text-lg tracking-tight">HireStack</span>
           </Link>
         </div>
         <div className="flex-1 overflow-y-auto">

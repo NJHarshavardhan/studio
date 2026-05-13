@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { FirebaseClientProvider } from "@/firebase/client-provider";
 
 export const metadata: Metadata = {
-  title: 'HirePulse | AI HR Automation Platform',
+  title: 'HireStack | AI HR Automation Platform',
   description: 'Streamline your recruitment with AI resume matching and dynamic interview agents.',
 };
 

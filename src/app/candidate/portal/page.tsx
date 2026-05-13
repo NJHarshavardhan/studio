@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useMemo } from "react";
@@ -67,7 +66,7 @@ export default function CandidatePortal() {
           <div className="bg-primary p-1.5 rounded-lg text-white">
             <Bot className="h-5 w-5" />
           </div>
-          <span className="font-bold text-lg tracking-tight">HirePulse</span>
+          <span className="font-bold text-lg tracking-tight">HireStack</span>
         </Link>
         <div className="flex items-center gap-4">
           <div className="text-right hidden sm:block">
@@ -103,7 +102,7 @@ export default function CandidatePortal() {
                       </div>
                       <div>
                         <CardTitle className="text-xl">Senior Software Engineer</CardTitle>
-                        <CardDescription>HirePulse Inc. • Remote</CardDescription>
+                        <CardDescription>HireStack Inc. • Remote</CardDescription>
                       </div>
                     </div>
                     <Badge className="bg-blue-50 text-blue-700 border-none px-4 py-1.5 rounded-full">

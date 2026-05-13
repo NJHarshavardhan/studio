@@ -10,7 +10,7 @@ export default function Home() {
           <div className="bg-primary p-1.5 rounded-lg text-white">
             <Bot className="h-6 w-6" />
           </div>
-          <span className="font-headline font-bold text-xl tracking-tight">HirePulse</span>
+          <span className="font-headline font-bold text-xl tracking-tight">HireStack</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
           <Link className="text-sm font-medium hover:text-primary transition-colors" href="/candidate/portal">
@@ -82,7 +82,7 @@ export default function Home() {
 
       <footer className="border-t py-8 bg-white">
         <div className="container px-4 md:px-6 mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-slate-500">© 2024 HirePulse Inc. All rights reserved.</p>
+          <p className="text-sm text-slate-500">© 2024 HireStack Inc. All rights reserved.</p>
           <div className="flex gap-6">
             <Link className="text-sm text-slate-500 hover:underline underline-offset-4" href="#">Terms</Link>
             <Link className="text-sm text-slate-500 hover:underline underline-offset-4" href="#">Privacy</Link>

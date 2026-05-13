@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useParams } from "next/navigation";
@@ -108,7 +107,7 @@ export default function PublicInterviewPage() {
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border shadow-sm">
             <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
             <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
-              Secure Session • Powered by HirePulse GenAI
+              Secure Session • Powered by HireStack GenAI
             </p>
           </div>
         </div>

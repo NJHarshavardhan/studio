@@ -45,7 +45,7 @@ export default function ProfilePage() {
                 <Label>Work Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input defaultValue="jane.doe@hirepulse.ai" className="pl-10" />
+                  <Input defaultValue="jane.doe@hirestack.ai" className="pl-10" />
                 </div>
               </div>
               <div className="space-y-2">
