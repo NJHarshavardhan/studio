@@ -7,6 +7,7 @@ import { useFirestore } from "@/firebase";
 import { InterviewSession } from "@/components/ai/interview-session";
 import { Bot, Loader2, AlertCircle, ChevronLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useMemoFirebase } from "@/firebase";
 
