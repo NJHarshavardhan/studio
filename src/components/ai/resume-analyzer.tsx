@@ -1,10 +1,11 @@
+
 "use client"
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { FileUp, Loader2, CheckCircle2, AlertCircle, Mail, Phone, Calendar } from "lucide-react";
+import { FileUp, Loader2, CheckCircle2, AlertCircle, Mail, Phone, Calendar, Info } from "lucide-react";
 import { aiResumeMatcherAndAnalyzer, type AiResumeMatcherAndAnalyzerOutput } from "@/ai/flows/ai-resume-matcher-and-analyzer";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,7 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface ResumeAnalyzerProps {
   jobDescription: string;
@@ -21,6 +23,7 @@ interface ResumeAnalyzerProps {
 export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
+  const [quotaError, setQuotaError] = useState<string | null>(null);
   const [result, setResult] = useState<AiResumeMatcherAndAnalyzerOutput & { resumeDataUri?: string } | null>(null);
   const { toast } = useToast();
   const firestore = useFirestore();
@@ -32,6 +35,7 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
 
     setIsAnalyzing(true);
     setResult(null);
+    setQuotaError(null);
 
     try {
       const reader = new FileReader();
@@ -50,11 +54,24 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
           });
         } catch (error: any) {
           console.error('Resume Analysis Error:', error);
-          toast({
-            variant: "destructive",
-            title: "Analysis Failed",
-            description: error.message || "Failed to analyze resume. Please try again with a different file.",
-          });
+          
+          // Handle Quota Error (429) specifically
+          if (error.message?.includes('429') || error.message?.includes('RESOURCE_EXHAUSTED')) {
+            const waitTimeMatch = error.message.match(/retry in ([\d.]+)s/);
+            const waitTime = waitTimeMatch ? Math.ceil(parseFloat(waitTimeMatch[1])) : 20;
+            setQuotaError(`Gemini API Free Tier quota exceeded. Please wait about ${waitTime} seconds before analyzing another resume.`);
+            toast({
+              variant: "destructive",
+              title: "Rate Limit Exceeded",
+              description: `Please wait ${waitTime}s before retrying.`,
+            });
+          } else {
+            toast({
+              variant: "destructive",
+              title: "Analysis Failed",
+              description: error.message || "Failed to analyze resume. Please try again with a different file.",
+            });
+          }
         } finally {
           setIsAnalyzing(false);
         }
@@ -120,6 +137,16 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
 
   return (
     <div className="space-y-6">
+      {quotaError && (
+        <Alert variant="destructive" className="bg-red-50 border-red-200 text-red-800">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>API Rate Limit</AlertTitle>
+          <AlertDescription className="text-sm">
+            {quotaError}
+          </AlertDescription>
+        </Alert>
+      )}
+
       <Card className="border-dashed border-2 bg-slate-50/50">
         <CardContent className="flex flex-col items-center justify-center p-12">
           {isAnalyzing ? (

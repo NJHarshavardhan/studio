@@ -1,9 +1,12 @@
+
 "use client"
 
 import { ResumeAnalyzer } from "@/components/ai/resume-analyzer";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 export default function ScreeningPage() {
   const [jd, setJd] = useState(`We are looking for a Senior React Developer with 5+ years of experience.
@@ -15,10 +18,20 @@ Key Requirements:
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">AI Resume Screening</h1>
-        <p className="text-slate-500">Analyze candidate resumes against specific job descriptions.</p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">AI Resume Screening</h1>
+          <p className="text-slate-500">Analyze candidate resumes against specific job descriptions.</p>
+        </div>
       </div>
+
+      <Alert className="bg-blue-50 border-blue-200">
+        <Info className="h-4 w-4 text-blue-600" />
+        <AlertTitle className="text-blue-800">AI Quota Tip</AlertTitle>
+        <AlertDescription className="text-blue-700 text-xs">
+          The Gemini Free Tier allows for approximately 10-15 resume analyses per minute. If you hit a rate limit, simply wait 30 seconds before uploading the next file.
+        </AlertDescription>
+      </Alert>
 
       <div className="space-y-4">
         <div className="grid w-full gap-2">
