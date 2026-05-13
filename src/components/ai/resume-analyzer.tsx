@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from "react";
@@ -105,10 +104,8 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
       description: `${result.extractedInfo.name} has been added to the shortlist.`,
     });
     
-    // Non-blocking redirect
     router.push("/dashboard/candidates");
     
-    // Handle loading state quickly for better UX
     setTimeout(() => setIsApproving(false), 500);
   };
 
@@ -215,8 +212,8 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
                     <div>
                       <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Strengths</h4>
                       <div className="flex flex-wrap gap-2">
-                        {result.extractedInfo.strengths.map(s => (
-                          <Badge key={s} variant="secondary" className="bg-emerald-50 text-emerald-700 border-none">{s}</Badge>
+                        {result.extractedInfo.strengths.map((s, idx) => (
+                          <Badge key={`${s}-${idx}`} variant="secondary" className="bg-emerald-50 text-emerald-700 border-none">{s}</Badge>
                         ))}
                       </div>
                     </div>
@@ -228,7 +225,7 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
                       <div className="space-y-3">
                         {result.skillGapAnalysis.length > 0 ? (
                           result.skillGapAnalysis.map((gap, i) => (
-                            <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100">
+                            <div key={`gap-${i}`} className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100">
                               <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5" />
                               <div>
                                 <p className="text-sm font-semibold text-slate-900">{gap.skill}</p>
@@ -248,8 +245,8 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
                     <div>
                       <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Key Technologies</h4>
                       <div className="flex flex-wrap gap-2">
-                        {result.extractedInfo.technologies.map(t => (
-                          <Badge key={t} variant="outline" className="text-blue-600 border-blue-200 bg-blue-50/50">{t}</Badge>
+                        {result.extractedInfo.technologies.map((t, idx) => (
+                          <Badge key={`${t}-${idx}`} variant="outline" className="text-blue-600 border-blue-200 bg-blue-50/50">{t}</Badge>
                         ))}
                       </div>
                     </div>
