@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useParams } from "next/navigation";
@@ -22,7 +23,12 @@ export default function PublicInterviewPage() {
 
   const { data: candidate, loading, error } = useDoc(candidateRef);
 
-  if (loading) {
+  // We only show the error if we are NOT loading AND (we have an error OR candidate is null)
+  // But we must also wait for firestore to be defined before we say "not found"
+  const isInitializing = loading || !firestore;
+  const isNotFound = !isInitializing && (error || !candidate);
+
+  if (isInitializing) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="text-center space-y-6">
@@ -41,7 +47,7 @@ export default function PublicInterviewPage() {
     );
   }
 
-  if (error || !candidate) {
+  if (isNotFound) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <Card className="max-w-md w-full border-none shadow-2xl text-center rounded-3xl overflow-hidden">
@@ -79,7 +85,7 @@ export default function PublicInterviewPage() {
            </div>
            <div className="space-y-2">
              <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">
-               Welcome, {candidate.name}
+               Welcome, {candidate?.name}
              </h1>
              <p className="text-slate-500 max-w-lg mx-auto text-lg">
                You are starting the AI technical screening for the <span className="text-primary font-bold">Senior Software Engineer</span> position.
@@ -92,8 +98,8 @@ export default function PublicInterviewPage() {
           <div className="relative">
             <InterviewSession 
               jobDescription="Senior Software Engineer with focus on React, Next.js, Cloud architecture, and strong leadership skills." 
-              resumeText={`Candidate Name: ${candidate.name}. Experience reported: ${candidate.yearsOfExperience} years. Email: ${candidate.email}.`}
-              candidateId={candidate.id}
+              resumeText={`Candidate Name: ${candidate?.name}. Experience reported: ${candidate?.yearsOfExperience} years. Email: ${candidate?.email}.`}
+              candidateId={candidate?.id}
             />
           </div>
         </div>

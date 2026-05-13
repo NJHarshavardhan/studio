@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useMemo } from "react";
@@ -26,6 +27,8 @@ export default function CandidatePortal() {
   const activeApplication = useMemo(() => {
     return applications?.[0];
   }, [applications]);
+
+  const isActuallyLoading = loading && firestore && isLoggedIn;
 
   if (!isLoggedIn) {
     return (
@@ -84,7 +87,7 @@ export default function CandidatePortal() {
             <p className="text-slate-500 mt-1">Track your progress in our automated recruitment pipeline.</p>
           </div>
 
-          {loading ? (
+          {isActuallyLoading ? (
             <div className="flex flex-col items-center justify-center p-20 bg-white rounded-3xl border border-dashed">
               <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
               <p className="text-slate-500 animate-pulse">Retrieving application details...</p>
