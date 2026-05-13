@@ -1,11 +1,10 @@
-
 "use client"
 
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Bot, User, Send, CheckCircle2 } from "lucide-react";
+import { Bot, User, Send, CheckCircle2, ShieldCheck, Loader2 } from "lucide-react";
 import { dynamicAIInterviewAndEvaluation, type DynamicAIInterviewOutput } from "@/ai/flows/dynamic-ai-interview-and-evaluation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -82,7 +81,6 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
         setIsCompleted(true);
         setReport(response);
 
-        // Save session data to Firestore and trigger "Thank You" email
         if (candidateId && firestore) {
           const interviewsCol = collection(firestore, "interviews");
           const emailsCol = collection(firestore, "emails");
@@ -105,13 +103,11 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
             }));
           });
 
-          // Update candidate status and send email
           const candidateRef = doc(firestore, "candidates", candidateId);
           getDoc(candidateRef).then(async (snap) => {
              if (snap.exists()) {
                 const candidate = snap.data();
                 
-                // 1. Generate AI Thank You Email
                 const emailResult = await sendRecruitmentEmail({
                   candidateName: candidate.name,
                   candidateEmail: candidate.email,
@@ -119,7 +115,6 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
                   jobTitle: 'Senior Developer'
                 });
 
-                // 2. Log to internal Messages tab
                 addDoc(emailsCol, {
                   candidateEmail: candidate.email,
                   candidateName: candidate.name,
@@ -158,32 +153,43 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
 
   if (isCompleted && report) {
     return (
-      <Card className="max-w-3xl mx-auto border-none shadow-lg overflow-hidden animate-in zoom-in-95 duration-500">
-        <div className="bg-emerald-600 p-8 text-white text-center">
-          <CheckCircle2 className="h-16 w-16 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold">Interview Completed</h2>
-          <p className="opacity-90 mt-2">The session has been analyzed. You can view the AI thank-you note in the Messages dashboard.</p>
+      <Card className="max-w-3xl mx-auto border-none shadow-2xl overflow-hidden animate-in zoom-in-95 duration-700 rounded-3xl">
+        <div className="bg-gradient-to-br from-emerald-600 to-emerald-500 p-12 text-white text-center relative">
+          <div className="absolute top-4 right-4 bg-white/10 p-2 rounded-full">
+            <ShieldCheck className="h-6 w-6" />
+          </div>
+          <CheckCircle2 className="h-20 w-20 mx-auto mb-6 text-emerald-100" />
+          <h2 className="text-3xl font-bold">Interview Concluded</h2>
+          <p className="opacity-90 mt-3 text-lg">Thank you for your time. Your session has been processed and saved securely.</p>
         </div>
-        <CardContent className="p-8 space-y-8">
-          <div className="flex justify-center">
-            <div className="text-center">
-              <span className="text-sm font-medium text-slate-500 uppercase tracking-widest">Interview Score</span>
-              <div className="text-6xl font-extrabold text-slate-900 mt-2">{report.interviewScore}/100</div>
+        <CardContent className="p-12 space-y-10 bg-white">
+          <div className="flex flex-col items-center">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">Overall Assessment</span>
+            <div className="relative mt-4">
+              <svg className="h-32 w-32 -rotate-90">
+                <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-100" />
+                <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray={364} strokeDashoffset={364 - (364 * (report.interviewScore || 0)) / 100} className="text-emerald-500 transition-all duration-1000" />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-3xl font-black text-slate-900">{report.interviewScore}%</span>
+              </div>
             </div>
           </div>
           
           <div className="space-y-4">
-            <h3 className="text-lg font-bold flex items-center gap-2">
-               <Bot className="h-5 w-5 text-primary" /> AI Evaluation Summary
+            <h3 className="text-lg font-bold flex items-center gap-2 text-slate-900">
+               <Bot className="h-5 w-5 text-primary" /> Hiring AI Summary
             </h3>
-            <p className="text-slate-600 leading-relaxed bg-slate-50 p-6 rounded-xl border italic">
-              "{report.interviewSummary}"
-            </p>
+            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+              <p className="text-slate-600 leading-relaxed text-sm italic">
+                "{report.interviewSummary}"
+              </p>
+            </div>
           </div>
 
-          <div className="pt-4">
-            <Button className="w-full" variant="outline" onClick={() => window.location.reload()}>
-              Close Session
+          <div className="pt-6">
+            <Button className="w-full h-12 text-lg font-bold rounded-xl" onClick={() => window.location.href = '/candidate/portal'}>
+              Return to Portal
             </Button>
           </div>
         </CardContent>
@@ -192,39 +198,42 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
   }
 
   return (
-    <Card className="max-w-3xl mx-auto h-[600px] flex flex-col border-none shadow-xl bg-white overflow-hidden">
-      <CardHeader className="border-b bg-slate-50 px-6 py-4">
+    <Card className="max-w-3xl mx-auto h-[650px] flex flex-col border-none shadow-2xl bg-white overflow-hidden rounded-3xl border border-white">
+      <CardHeader className="border-b bg-white px-8 py-5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-primary p-2 rounded-lg text-white">
-              <Bot className="h-5 w-5" />
+          <div className="flex items-center gap-4">
+            <div className="bg-primary p-2.5 rounded-xl text-white shadow-lg shadow-primary/20">
+              <Bot className="h-6 w-6" />
             </div>
             <div>
-              <CardTitle className="text-lg">AI Recruitment Agent</CardTitle>
-              <p className="text-xs text-slate-500">Live technical screening interview</p>
+              <CardTitle className="text-xl font-bold text-slate-900">Technical Screening</CardTitle>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Secure Live Stream</p>
+              </div>
             </div>
           </div>
-          <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50">
-            Active Session
+          <Badge variant="outline" className="text-emerald-600 border-emerald-100 bg-emerald-50 px-3 py-1 rounded-full">
+            Active
           </Badge>
         </div>
       </CardHeader>
 
-      <ScrollArea className="flex-1 p-6 bg-slate-50/30">
-        <div className="space-y-6">
+      <ScrollArea className="flex-1 p-8 bg-slate-50/20">
+        <div className="space-y-8">
           {messages.map((msg, idx) => (
             <div key={idx} className={cn(
-              "flex gap-3",
+              "flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300",
               msg.role === 'user' ? "flex-row-reverse" : "flex-row"
             )}>
               <div className={cn(
-                "h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 mt-1",
+                "h-10 w-10 rounded-2xl flex items-center justify-center flex-shrink-0 mt-1 shadow-sm",
                 msg.role === 'model' ? "bg-primary text-white" : "bg-slate-200 text-slate-600"
               )}>
-                {msg.role === 'model' ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}
+                {msg.role === 'model' ? <Bot className="h-5 w-5" /> : <User className="h-5 w-5" />}
               </div>
               <div className={cn(
-                "max-w-[80%] p-4 rounded-2xl shadow-sm text-sm leading-relaxed",
+                "max-w-[75%] p-5 rounded-3xl shadow-sm text-sm leading-relaxed",
                 msg.role === 'model' 
                   ? "bg-white text-slate-800 rounded-tl-none border border-slate-100" 
                   : "bg-primary text-white rounded-tr-none"
@@ -234,34 +243,38 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
             </div>
           ))}
           {isLoading && (
-            <div className="flex gap-3 animate-pulse">
-               <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center">
-                 <Bot className="h-4 w-4 text-slate-400" />
+            <div className="flex gap-4 items-center">
+               <div className="h-10 w-10 rounded-2xl bg-slate-100 flex items-center justify-center">
+                 <Loader2 className="h-5 w-5 text-primary animate-spin" />
                </div>
-               <div className="bg-slate-200 h-10 w-32 rounded-2xl rounded-tl-none"></div>
+               <div className="bg-white border border-slate-100 p-4 rounded-3xl rounded-tl-none flex gap-1">
+                 <span className="h-1.5 w-1.5 bg-slate-200 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                 <span className="h-1.5 w-1.5 bg-slate-200 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                 <span className="h-1.5 w-1.5 bg-slate-200 rounded-full animate-bounce" />
+               </div>
             </div>
           )}
           <div ref={scrollRef} />
         </div>
       </ScrollArea>
 
-      <CardFooter className="border-t p-4 bg-white">
-        <div className="flex w-full items-center gap-2">
+      <CardFooter className="border-t p-6 bg-white">
+        <div className="flex w-full items-center gap-3">
           <Input 
-            placeholder="Type your response..." 
+            placeholder="Share your thoughts..." 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             disabled={isLoading || isCompleted}
-            className="flex-1 h-12 bg-slate-50 border-none rounded-full px-6 focus-visible:ring-primary"
+            className="flex-1 h-14 bg-slate-50 border-none rounded-2xl px-6 focus-visible:ring-primary shadow-inner"
           />
           <Button 
             size="icon" 
-            className="h-12 w-12 rounded-full shadow-lg shadow-primary/20"
+            className="h-14 w-14 rounded-2xl shadow-xl shadow-primary/20 transition-transform active:scale-95"
             onClick={handleSend}
             disabled={isLoading || !input.trim() || isCompleted}
           >
-            <Send className="h-5 w-5" />
+            <Send className="h-6 w-6" />
           </Button>
         </div>
       </CardFooter>
