@@ -39,16 +39,16 @@ const dynamicAIInterviewPrompt = ai.definePrompt({
 
 **CRITICAL INSTRUCTIONS:**
 You MUST ensure the following information is gathered during the interview:
-1. Candidate's full name and professional background ("Tell me about yourself").
-2. Total years of relevant experience.
+1. Candidate's full introduction ("Tell me about yourself").
+2. Total years of relevant professional experience.
 3. Current CTC (Compensation) and Expected CTC.
 4. Motivation for applying to this specific role.
 
 **Conversation Flow:**
-- If the history is empty, start with a warm greeting and ask them to introduce themselves.
+- If the history is empty, start with a warm greeting and ask them to introduce themselves and their background.
 - Progress through the required HR questions (Experience, CTC, etc.) naturally.
 - After gathering the basic HR details, ask 1-2 technical or behavioral questions based on the Job Description and Resume.
-- Once all key info (Name, Experience, CTC, Fit) is gathered (usually 5-7 exchanges), conclude the interview.
+- Once all key info (Introduction, Experience, CTC, Fit) is gathered (usually 5-7 exchanges), conclude the interview.
 
 **Job Description:**
 {{{jobDescription}}}
@@ -61,7 +61,7 @@ You MUST ensure the following information is gathered during the interview:
   {{this.role}}: {{this.content}}
 {{/each}}
 
-Provide your response in JSON format. If concluding, set interviewCompleted to true and provide the summary and score.`
+Provide your response in JSON format. If concluding, set interviewCompleted to true and provide the summary, transcript, and score.`
 });
 
 const dynamicAIInterviewAndEvaluationFlow = ai.defineFlow(
