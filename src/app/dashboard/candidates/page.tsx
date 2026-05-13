@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useMemo } from "react";
@@ -18,7 +19,7 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, updateDoc, doc } from "firebase/firestore";
+import { collection, updateDoc, doc, addDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -55,14 +56,30 @@ export default function CandidatesPipeline() {
     
     try {
       // 1. Trigger the AI Email Flow (Server Side)
-      await sendRecruitmentEmail({
+      const emailResult = await sendRecruitmentEmail({
         candidateName: candidate.name,
         candidateEmail: candidate.email,
         type: 'interview_invite',
-        jobTitle: 'Senior Developer' // Hardcoded for demo, could be from candidate object
+        jobTitle: 'Senior Developer'
       });
 
-      // 2. Update Firestore Status
+      // 2. Log the email to Firestore (Internal Messaging Center)
+      const emailsCol = collection(firestore, "emails");
+      addDoc(emailsCol, {
+        candidateEmail: candidate.email,
+        candidateName: candidate.name,
+        subject: emailResult.subject,
+        body: emailResult.body,
+        type: 'interview_invite',
+        sentAt: new Date().toISOString()
+      }).catch(async (e) => {
+         errorEmitter.emit('permission-error', new FirestorePermissionError({
+           path: emailsCol.path,
+           operation: 'create'
+         }));
+      });
+
+      // 3. Update Candidate Status
       const cRef = doc(firestore, "candidates", candidate.id);
       const updateData = {
         interviewStatus: "sent",
@@ -81,13 +98,13 @@ export default function CandidatesPipeline() {
       
       toast({
         title: "Interview Request Sent",
-        description: `An AI interview link has been sent to ${candidate.email}.`,
+        description: `Check the Messages tab to view the AI-generated invite for ${candidate.email}.`,
       });
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Mail Failed",
-        description: "Could not trigger the recruitment email flow.",
+        title: "Process Failed",
+        description: "Could not generate or send the recruitment email.",
       });
     } finally {
       setIsSendingMail(null);

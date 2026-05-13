@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "Candidate": {
@@ -32,6 +33,20 @@
         "completedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["candidateId", "jobId", "status"]
+    },
+    "EmailLog": {
+      "title": "Email Log",
+      "description": "A record of emails sent to candidates via the AI system.",
+      "type": "object",
+      "properties": {
+        "candidateEmail": { "type": "string" },
+        "candidateName": { "type": "string" },
+        "subject": { "type": "string" },
+        "body": { "type": "string" },
+        "type": { "type": "string" },
+        "sentAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["candidateEmail", "subject", "body", "sentAt"]
     }
   },
   "auth": {
@@ -45,6 +60,10 @@
     "/interviews/{interviewId}": {
       "schema": "InterviewSession",
       "description": "Logs of AI interview sessions."
+    },
+    "/emails/{emailId}": {
+      "schema": "EmailLog",
+      "description": "Audit log of all AI-generated recruitment emails."
     }
   }
 }

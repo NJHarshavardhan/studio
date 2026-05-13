@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useRef, useEffect } from "react";
@@ -84,6 +85,8 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
         // Save session data to Firestore and trigger "Thank You" email
         if (candidateId && firestore) {
           const interviewsCol = collection(firestore, "interviews");
+          const emailsCol = collection(firestore, "emails");
+
           const interviewData = {
             candidateId,
             jobId,
@@ -107,12 +110,28 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
           getDoc(candidateRef).then(async (snap) => {
              if (snap.exists()) {
                 const candidate = snap.data();
-                // Send "Thank You" AI email
-                await sendRecruitmentEmail({
+                
+                // 1. Generate AI Thank You Email
+                const emailResult = await sendRecruitmentEmail({
                   candidateName: candidate.name,
                   candidateEmail: candidate.email,
                   type: 'interview_thank_you',
                   jobTitle: 'Senior Developer'
+                });
+
+                // 2. Log to internal Messages tab
+                addDoc(emailsCol, {
+                  candidateEmail: candidate.email,
+                  candidateName: candidate.name,
+                  subject: emailResult.subject,
+                  body: emailResult.body,
+                  type: 'interview_thank_you',
+                  sentAt: new Date().toISOString()
+                }).catch(async (e) => {
+                  errorEmitter.emit('permission-error', new FirestorePermissionError({
+                    path: emailsCol.path,
+                    operation: 'create'
+                  }));
                 });
              }
           });
@@ -143,7 +162,7 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
         <div className="bg-emerald-600 p-8 text-white text-center">
           <CheckCircle2 className="h-16 w-16 mx-auto mb-4" />
           <h2 className="text-2xl font-bold">Interview Completed</h2>
-          <p className="opacity-90 mt-2">The session has been analyzed and a confirmation email has been sent.</p>
+          <p className="opacity-90 mt-2">The session has been analyzed. You can view the AI thank-you note in the Messages dashboard.</p>
         </div>
         <CardContent className="p-8 space-y-8">
           <div className="flex justify-center">
