@@ -47,13 +47,17 @@ export default function DashboardLayout({
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5 text-slate-600" />
-              <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border-2 border-white"></span>
-            </Button>
-            <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center border cursor-pointer">
-              <User className="h-4 w-4 text-slate-600" />
-            </div>
+            <Link href="/dashboard/notifications">
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="h-5 w-5 text-slate-600" />
+                <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border-2 border-white"></span>
+              </Button>
+            </Link>
+            <Link href="/dashboard/profile">
+              <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center border cursor-pointer hover:bg-slate-200 transition-colors">
+                <User className="h-4 w-4 text-slate-600" />
+              </div>
+            </Link>
           </div>
         </header>
         <main className="p-8">
