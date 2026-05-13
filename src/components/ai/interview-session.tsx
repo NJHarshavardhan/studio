@@ -1,18 +1,19 @@
-
 "use client"
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Bot, User, Send, CheckCircle2, MessageSquare } from "lucide-react";
+import { Bot, User, Send, CheckCircle2 } from "lucide-react";
 import { dynamicAIInterviewAndEvaluation, type DynamicAIInterviewOutput } from "@/ai/flows/dynamic-ai-interview-and-evaluation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { useFirestore } from "@/firebase";
-import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
+import { collection, addDoc, updateDoc, doc, getDoc } from "firebase/firestore";
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { sendRecruitmentEmail } from "@/ai/flows/send-recruitment-email";
+import { cn } from "@/lib/utils";
 
 interface InterviewSessionProps {
   jobDescription: string;
@@ -80,7 +81,7 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
         setIsCompleted(true);
         setReport(response);
 
-        // Save session data to Firestore if candidateId is present
+        // Save session data to Firestore and trigger "Thank You" email
         if (candidateId && firestore) {
           const interviewsCol = collection(firestore, "interviews");
           const interviewData = {
@@ -101,8 +102,21 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
             }));
           });
 
-          // Update candidate status
+          // Update candidate status and send email
           const candidateRef = doc(firestore, "candidates", candidateId);
+          getDoc(candidateRef).then(async (snap) => {
+             if (snap.exists()) {
+                const candidate = snap.data();
+                // Send "Thank You" AI email
+                await sendRecruitmentEmail({
+                  candidateName: candidate.name,
+                  candidateEmail: candidate.email,
+                  type: 'interview_thank_you',
+                  jobTitle: 'Senior Developer'
+                });
+             }
+          });
+
           updateDoc(candidateRef, {
             currentStage: "HR Review",
             interviewStatus: "completed"
@@ -129,7 +143,7 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
         <div className="bg-emerald-600 p-8 text-white text-center">
           <CheckCircle2 className="h-16 w-16 mx-auto mb-4" />
           <h2 className="text-2xl font-bold">Interview Completed</h2>
-          <p className="opacity-90 mt-2">The session has been analyzed by our AI agents.</p>
+          <p className="opacity-90 mt-2">The session has been analyzed and a confirmation email has been sent.</p>
         </div>
         <CardContent className="p-8 space-y-8">
           <div className="flex justify-center">
@@ -234,8 +248,4 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
       </CardFooter>
     </Card>
   );
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(' ');
 }

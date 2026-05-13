@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useMemo } from "react";
@@ -14,7 +13,8 @@ import {
   CheckCircle2, 
   UserPlus,
   Send,
-  Loader2
+  Loader2,
+  Mail
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useFirestore, useCollection } from "@/firebase";
@@ -22,6 +22,7 @@ import { collection, updateDoc, doc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { sendRecruitmentEmail } from "@/ai/flows/send-recruitment-email";
 import type { Candidate, PipelineStage } from "@/lib/types";
 
 const STAGES: PipelineStage[] = [
@@ -35,6 +36,7 @@ const STAGES: PipelineStage[] = [
 
 export default function CandidatesPipeline() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isSendingMail, setIsSendingMail] = useState<string | null>(null);
   const firestore = useFirestore();
   const { toast } = useToast();
   
@@ -46,29 +48,50 @@ export default function CandidatesPipeline() {
     c.email?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
-  const handleSendInterviewRequest = (candidateId: string, email: string) => {
+  const handleSendInterviewRequest = async (candidate: any) => {
     if (!firestore) return;
     
-    const cRef = doc(firestore, "candidates", candidateId);
-    const updateData = {
-      interviewStatus: "sent",
-      currentStage: "AI Interview"
-    };
-
-    updateDoc(cRef, updateData)
-      .catch(async (serverError) => {
-        const permissionError = new FirestorePermissionError({
-          path: cRef.path,
-          operation: 'update',
-          requestResourceData: updateData,
-        });
-        errorEmitter.emit('permission-error', permissionError);
-      });
+    setIsSendingMail(candidate.id);
     
-    toast({
-      title: "Interview Request Sent",
-      description: `An AI interview link has been sent to ${email}.`,
-    });
+    try {
+      // 1. Trigger the AI Email Flow (Server Side)
+      await sendRecruitmentEmail({
+        candidateName: candidate.name,
+        candidateEmail: candidate.email,
+        type: 'interview_invite',
+        jobTitle: 'Senior Developer' // Hardcoded for demo, could be from candidate object
+      });
+
+      // 2. Update Firestore Status
+      const cRef = doc(firestore, "candidates", candidate.id);
+      const updateData = {
+        interviewStatus: "sent",
+        currentStage: "AI Interview"
+      };
+
+      updateDoc(cRef, updateData)
+        .catch(async (serverError) => {
+          const permissionError = new FirestorePermissionError({
+            path: cRef.path,
+            operation: 'update',
+            requestResourceData: updateData,
+          });
+          errorEmitter.emit('permission-error', permissionError);
+        });
+      
+      toast({
+        title: "Interview Request Sent",
+        description: `An AI interview link has been sent to ${candidate.email}.`,
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Mail Failed",
+        description: "Could not trigger the recruitment email flow.",
+      });
+    } finally {
+      setIsSendingMail(null);
+    }
   };
 
   if (loading) {
@@ -142,12 +165,14 @@ export default function CandidatesPipeline() {
                            variant="outline" 
                            size="sm" 
                            className="w-full mt-2 h-7 text-[10px] bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border-indigo-200"
+                           disabled={isSendingMail === candidate.id}
                            onClick={(e) => {
                              e.stopPropagation();
-                             handleSendInterviewRequest(candidate.id, candidate.email);
+                             handleSendInterviewRequest(candidate);
                            }}
                          >
-                           <Send className="h-3 w-3 mr-1" /> Request AI Interview
+                           {isSendingMail === candidate.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3 mr-1" />}
+                           {isSendingMail === candidate.id ? "Sending..." : "Request AI Interview"}
                          </Button>
                       )}
 
