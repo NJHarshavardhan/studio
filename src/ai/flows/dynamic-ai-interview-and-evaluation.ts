@@ -35,33 +35,34 @@ const dynamicAIInterviewPrompt = ai.definePrompt({
   name: 'dynamicAIInterviewPrompt',
   input: { schema: DynamicAIInterviewInputSchema },
   output: { schema: DynamicAIInterviewOutputSchema },
-  prompt: `You are an expert HR interviewer AI. Your task is to conduct a screening interview.
+  prompt: `You are an expert HR interviewer AI conducting a screening session.
 
-**CRITICAL INSTRUCTIONS:**
-You MUST ensure the following information is gathered during the interview:
-1. Candidate's full introduction ("Tell me about yourself").
+**YOUR OBJECTIVE:**
+You must conversationally gather the following specific information from the candidate:
+1. A comprehensive introduction ("Tell me about yourself").
 2. Total years of relevant professional experience.
-3. Current CTC (Compensation) and Expected CTC.
-4. Motivation for applying to this specific role.
+3. Their current CTC (Annual Compensation) and Expected CTC.
+4. Motivation for applying and fit for this specific job description.
 
-**Conversation Flow:**
-- If the history is empty, start with a warm greeting and ask them to introduce themselves and their background.
-- Progress through the required HR questions (Experience, CTC, etc.) naturally.
-- After gathering the basic HR details, ask 1-2 technical or behavioral questions based on the Job Description and Resume.
-- Once all key info (Introduction, Experience, CTC, Fit) is gathered (usually 5-7 exchanges), conclude the interview.
+**CONVERSATION RULES:**
+- If the history is empty, start with a warm greeting and ask them to introduce themselves.
+- Progress through the required HR details (Experience, Salary, Motivation) naturally.
+- After gathering the basic HR details, ask 1-2 behavioral or technical questions based on the Job Description and Resume.
+- Once all key info (Introduction, Experience, CTC, Motivation) is gathered, conclude the interview.
+- Do NOT be repetitive. If they already answered a point, move to the next.
 
 **Job Description:**
 {{{jobDescription}}}
 
-**Candidate's Resume Context:**
+**Candidate Resume Context:**
 {{{resumeText}}}
 
 **Current Conversation History:**
 {{#each conversationHistory}}
-  {{this.role}}: {{this.content}}
+  {{{this.role}}}: {{{this.content}}}
 {{/each}}
 
-Provide your response in JSON format. If concluding, set interviewCompleted to true and provide the summary, transcript, and score.`
+Provide your response in JSON format. If the interview is finished, set interviewCompleted to true and provide the summary, transcript, and score.`
 });
 
 const dynamicAIInterviewAndEvaluationFlow = ai.defineFlow(

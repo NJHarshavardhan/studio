@@ -112,7 +112,7 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
                   candidateName: candidate.name,
                   candidateEmail: candidate.email,
                   type: 'interview_thank_you',
-                  jobTitle: 'Senior Developer'
+                  jobTitle: 'Software Engineer'
                 });
 
                 addDoc(emailsCol, {
@@ -160,12 +160,12 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
           </div>
           <CheckCircle2 className="h-20 w-20 mx-auto mb-6 text-emerald-100" />
           <h2 className="text-3xl font-bold">Interview Concluded</h2>
-          <p className="opacity-90 mt-3 text-lg">Thank you for your time. Your session has been processed and saved securely.</p>
+          <p className="opacity-90 mt-3 text-lg text-emerald-50">Thank you for your time. Your session has been processed and saved securely.</p>
         </div>
         <CardContent className="p-12 space-y-10 bg-white">
           <div className="flex flex-col items-center">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">Overall Assessment</span>
-            <div className="relative mt-4">
+            <div className="relative mt-6">
               <svg className="h-32 w-32 -rotate-90">
                 <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-100" />
                 <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray={364} strokeDashoffset={364 - (364 * (report.interviewScore || 0)) / 100} className="text-emerald-500 transition-all duration-1000" />
@@ -198,7 +198,7 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
   }
 
   return (
-    <Card className="max-w-3xl mx-auto h-[650px] flex flex-col border-none shadow-2xl bg-white overflow-hidden rounded-3xl border border-white">
+    <Card className="max-w-3xl mx-auto h-[650px] flex flex-col border-none shadow-2xl bg-white overflow-hidden rounded-3xl">
       <CardHeader className="border-b bg-white px-8 py-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -206,15 +206,15 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
               <Bot className="h-6 w-6" />
             </div>
             <div>
-              <CardTitle className="text-xl font-bold text-slate-900">Technical Screening</CardTitle>
+              <CardTitle className="text-xl font-bold text-slate-900">AI Screening Session</CardTitle>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Secure Live Stream</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Live & Secure</p>
               </div>
             </div>
           </div>
           <Badge variant="outline" className="text-emerald-600 border-emerald-100 bg-emerald-50 px-3 py-1 rounded-full">
-            Active
+            Session Active
           </Badge>
         </div>
       </CardHeader>
@@ -233,7 +233,7 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
                 {msg.role === 'model' ? <Bot className="h-5 w-5" /> : <User className="h-5 w-5" />}
               </div>
               <div className={cn(
-                "max-w-[75%] p-5 rounded-3xl shadow-sm text-sm leading-relaxed",
+                "max-w-[80%] p-5 rounded-3xl shadow-sm text-sm leading-relaxed",
                 msg.role === 'model' 
                   ? "bg-white text-slate-800 rounded-tl-none border border-slate-100" 
                   : "bg-primary text-white rounded-tr-none"
@@ -247,10 +247,10 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
                <div className="h-10 w-10 rounded-2xl bg-slate-100 flex items-center justify-center">
                  <Loader2 className="h-5 w-5 text-primary animate-spin" />
                </div>
-               <div className="bg-white border border-slate-100 p-4 rounded-3xl rounded-tl-none flex gap-1">
-                 <span className="h-1.5 w-1.5 bg-slate-200 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                 <span className="h-1.5 w-1.5 bg-slate-200 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                 <span className="h-1.5 w-1.5 bg-slate-200 rounded-full animate-bounce" />
+               <div className="bg-white border border-slate-100 p-4 rounded-3xl rounded-tl-none flex gap-1.5">
+                 <span className="h-1.5 w-1.5 bg-slate-300 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                 <span className="h-1.5 w-1.5 bg-slate-300 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                 <span className="h-1.5 w-1.5 bg-slate-300 rounded-full animate-bounce" />
                </div>
             </div>
           )}
@@ -261,7 +261,7 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
       <CardFooter className="border-t p-6 bg-white">
         <div className="flex w-full items-center gap-3">
           <Input 
-            placeholder="Share your thoughts..." 
+            placeholder="Type your answer..." 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
@@ -270,7 +270,7 @@ export function InterviewSession({ jobDescription, resumeText, candidateId, jobI
           />
           <Button 
             size="icon" 
-            className="h-14 w-14 rounded-2xl shadow-xl shadow-primary/20 transition-transform active:scale-95"
+            className="h-14 w-14 rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-95"
             onClick={handleSend}
             disabled={isLoading || !input.trim() || isCompleted}
           >
