@@ -11,8 +11,14 @@ import { User, Mail, Shield, Briefcase, Camera, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ProfilePage() {
+  const [profile, setProfile] = useState({
+    name: "Jane Doe",
+    email: "jane.doe@hirestack.ai",
+    title: "Senior HR Manager",
+  });
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -46,6 +52,18 @@ export default function ProfilePage() {
     fileInputRef.current?.click();
   };
 
+  const handleUpdateProfile = () => {
+    setIsSaving(true);
+    // Simulating a database save
+    setTimeout(() => {
+      setIsSaving(false);
+      toast({
+        title: "Profile Updated",
+        description: "Your personal details have been saved successfully.",
+      });
+    }, 800);
+  };
+
   return (
     <div className="space-y-8 max-w-3xl">
       <div>
@@ -64,7 +82,9 @@ export default function ProfilePage() {
               <div className="relative group">
                 <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
                   <AvatarImage src={avatarUrl} className="object-cover" />
-                  <AvatarFallback className="bg-primary/10 text-primary text-3xl font-bold">JD</AvatarFallback>
+                  <AvatarFallback className="bg-primary/10 text-primary text-3xl font-bold">
+                    {profile.name.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
                 </Avatar>
                 <button 
                   onClick={triggerFileInput}
@@ -94,28 +114,40 @@ export default function ProfilePage() {
                 <Label className="text-slate-700">Full Name</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input defaultValue="Jane Doe" className="pl-10 h-11 bg-slate-50 border-none focus-visible:ring-1" />
+                  <Input 
+                    value={profile.name} 
+                    onChange={(e) => setProfile({...profile, name: e.target.value})}
+                    className="pl-10 h-11 bg-slate-50 border-none focus-visible:ring-1" 
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label className="text-slate-700">Work Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input defaultValue="jane.doe@hirestack.ai" className="pl-10 h-11 bg-slate-50 border-none focus-visible:ring-1" />
+                  <Input 
+                    value={profile.email} 
+                    onChange={(e) => setProfile({...profile, email: e.target.value})}
+                    className="pl-10 h-11 bg-slate-50 border-none focus-visible:ring-1" 
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label className="text-slate-700">Job Title</Label>
                 <div className="relative">
                   <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input defaultValue="Senior HR Manager" className="pl-10 h-11 bg-slate-50 border-none focus-visible:ring-1" />
+                  <Input 
+                    value={profile.title} 
+                    onChange={(e) => setProfile({...profile, title: e.target.value})}
+                    className="pl-10 h-11 bg-slate-50 border-none focus-visible:ring-1" 
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label className="text-slate-700">Access Role</Label>
                 <div className="relative">
                   <Shield className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input defaultValue="Admin" disabled className="pl-10 h-11 bg-slate-100 border-none opacity-70" />
+                  <Input value="Admin" disabled className="pl-10 h-11 bg-slate-100 border-none opacity-70" />
                 </div>
               </div>
             </div>
@@ -123,8 +155,13 @@ export default function ProfilePage() {
         </Card>
 
         <div className="flex justify-end gap-3">
-          <Button variant="outline" className="h-11 px-8">Cancel</Button>
-          <Button className="h-11 px-8 shadow-lg shadow-primary/20" onClick={() => toast({ title: "Profile Updated", description: "Your changes have been saved." })}>
+          <Button variant="outline" className="h-11 px-8" disabled={isSaving}>Cancel</Button>
+          <Button 
+            className="h-11 px-8 shadow-lg shadow-primary/20" 
+            onClick={handleUpdateProfile}
+            disabled={isSaving}
+          >
+            {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
             Update Profile
           </Button>
         </div>

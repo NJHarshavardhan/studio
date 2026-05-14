@@ -32,7 +32,24 @@ export default function JobsPage() {
   });
 
   const handleCreateJob = () => {
-    if (!newJob.title || !newJob.description || !jobsRef) return;
+    if (!firestore || !jobsRef) {
+      toast({
+        variant: "destructive",
+        title: "Connection Error",
+        description: "Firestore is not initialized yet. Please wait a moment."
+      });
+      return;
+    }
+
+    if (!newJob.title || !newJob.description) {
+      toast({
+        variant: "destructive",
+        title: "Missing Fields",
+        description: "Please provide both a title and a description."
+      });
+      return;
+    }
+
     setIsCreating(true);
 
     const jobData = {
@@ -106,7 +123,7 @@ export default function JobsPage() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-              <Button onClick={handleCreateJob} disabled={isCreating}>
+              <Button onClick={handleCreateJob} disabled={isCreating || !firestore}>
                 {isCreating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : "Create Job"}
               </Button>
             </DialogFooter>
