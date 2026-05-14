@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Users, Briefcase, Bot, CheckCircle2, TrendingUp, Clock, Loader2, Database, Sparkles, ArrowUpRight, ArrowDownRight, PieChart } from "lucide-react";
 import { 
@@ -33,9 +33,15 @@ const data = [
 
 export default function Dashboard() {
   const [isSeeding, setIsSeeding] = useState(false);
+  const [skeletonHeights, setSkeletonHeights] = useState<number[]>([]);
   const firestore = useFirestore();
   const { toast } = useToast();
   
+  useEffect(() => {
+    // Generate random heights once on mount to avoid hydration mismatch
+    setSkeletonHeights(Array.from({ length: 7 }, () => Math.floor(Math.random() * 60) + 20));
+  }, []);
+
   const candidatesRef = useMemoFirebase(() => firestore ? collection(firestore, "candidates") : null, [firestore]);
   const jobsRef = useMemoFirebase(() => firestore ? collection(firestore, "jobs") : null, [firestore]);
   const interviewsRef = useMemoFirebase(() => firestore ? collection(firestore, "interviews") : null, [firestore]);
@@ -205,7 +211,13 @@ export default function Dashboard() {
              {isLoading ? (
               <div className="w-full h-full flex flex-col gap-4">
                 <div className="flex items-end justify-between flex-1 gap-2">
-                   {[1,2,3,4,5,6,7].map(i => <Skeleton key={i} className="w-full" style={{ height: `${Math.random() * 80 + 20}%` }} />)}
+                   {Array.from({ length: 7 }).map((_, i) => (
+                     <Skeleton 
+                      key={i} 
+                      className="w-full" 
+                      style={{ height: skeletonHeights[i] ? `${skeletonHeights[i]}%` : '50%' }} 
+                    />
+                   ))}
                 </div>
                 <div className="flex justify-between">
                    {[1,2,3,4,5,6,7].map(i => <Skeleton key={i} className="h-4 w-8" />)}

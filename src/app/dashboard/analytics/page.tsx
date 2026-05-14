@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { 
   BarChart, 
@@ -22,8 +22,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
 
 export default function AnalyticsPage() {
+  const [skeletonWidths, setSkeletonWidths] = useState<number[]>([]);
   const firestore = useFirestore();
   
+  useEffect(() => {
+    // Generate random widths once on mount to avoid hydration mismatch
+    setSkeletonWidths(Array.from({ length: 7 }, () => Math.floor(Math.random() * 50) + 20));
+  }, []);
+
   const candidatesRef = useMemoFirebase(() => firestore ? collection(firestore, "candidates") : null, [firestore]);
   const interviewsRef = useMemoFirebase(() => firestore ? collection(firestore, "interviews") : null, [firestore]);
 
@@ -105,7 +111,10 @@ export default function AnalyticsPage() {
                 {Array.from({ length: 7 }).map((_, i) => (
                   <div key={i} className="flex items-center gap-4">
                     <Skeleton className="h-4 w-20" />
-                    <Skeleton className="h-4 flex-1" style={{ width: `${Math.random() * 50 + 20}%` }} />
+                    <Skeleton 
+                      className="h-4 flex-1" 
+                      style={{ width: skeletonWidths[i] ? `${skeletonWidths[i]}%` : '50%' }} 
+                    />
                   </div>
                 ))}
               </div>
