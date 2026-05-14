@@ -6,7 +6,7 @@ import { useDoc } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { useFirestore } from "@/firebase";
 import { InterviewSession } from "@/components/ai/interview-session";
-import { Bot, AlertCircle, ChevronLeft } from "lucide-react";
+import { Bot, AlertCircle, ChevronLeft, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -25,6 +25,7 @@ export default function PublicInterviewPage() {
 
   const isInitializing = loading || !firestore;
   const isNotFound = !isInitializing && (error || !candidate);
+  const isCompleted = !isInitializing && candidate?.interviewStatus === "completed";
 
   if (isInitializing) {
     return (
@@ -56,7 +57,7 @@ export default function PublicInterviewPage() {
             </div>
             <CardTitle className="text-2xl font-bold">Session Not Found</CardTitle>
             <CardDescription className="text-slate-500 mt-2">
-              This interview link appears to be invalid or has expired. Please contact your recruitment manager or check your candidate portal.
+              This interview link appears to be invalid or has expired. Please contact your recruitment manager.
             </CardDescription>
           </CardHeader>
           <CardContent className="pb-10">
@@ -65,6 +66,32 @@ export default function PublicInterviewPage() {
                  Go to Candidate Portal
                </Button>
              </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (isCompleted) {
+    return (
+      <div className="min-h-screen bg-[#F8F9FC] flex items-center justify-center p-4">
+        <Card className="max-w-md w-full border-none shadow-2xl text-center rounded-3xl overflow-hidden">
+          <div className="bg-emerald-500 h-2" />
+          <CardHeader className="pt-12 px-8">
+            <div className="h-20 w-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle2 className="h-10 w-10 text-emerald-500" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-slate-900">Interview Completed</CardTitle>
+            <CardDescription className="text-slate-500 mt-4 leading-relaxed">
+              Hi {candidate?.name}, you have already finished your AI screening session. Our recruitment team is currently reviewing your results.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pb-12 px-8">
+            <Link href="/candidate/portal">
+              <Button className="w-full h-12 text-base font-bold rounded-xl shadow-lg shadow-primary/10">
+                Check Detailed Status
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

@@ -10,7 +10,7 @@ import { aiResumeMatcherAndAnalyzer, type AiResumeMatcherAndAnalyzerOutput } fro
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { useFirestore } from "@/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
@@ -46,45 +46,52 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
     setResult(null);
     setIsAnalyzing(true);
 
-    try {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64String = reader.result as string;
-        
-        try {
-          const analysis = await aiResumeMatcherAndAnalyzer({
-            resumeDataUri: base64String,
-            jobDescription: jobDescription,
-          });
-          setResult({ ...analysis, resumeDataUri: base64String });
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64String = reader.result as string;
+      
+      try {
+        const analysis = await aiResumeMatcherAndAnalyzer({
+          resumeDataUri: base64String,
+          jobDescription: jobDescription,
+        });
+        setResult({ ...analysis, resumeDataUri: base64String });
+        toast({
+          title: "Analysis Complete",
+          description: `${analysis.extractedInfo.name} matched with ${analysis.matchScore}%`,
+        });
+      } catch (error: any) {
+        console.error("Resume Analysis Error:", error);
+        if (error.message?.includes('429') || error.message?.includes('RESOURCE_EXHAUSTED')) {
+          setQuotaWait(30);
           toast({
-            title: "Analysis Complete",
-            description: `${analysis.extractedInfo.name} matched with ${analysis.matchScore}%`,
+            variant: "destructive",
+            title: "API Limit Reached",
+            description: "Please wait for the cooldown timer before retrying.",
           });
-        } catch (error: any) {
-          if (error.message?.includes('429') || error.message?.includes('RESOURCE_EXHAUSTED')) {
-            const waitSeconds = 30;
-            setQuotaWait(waitSeconds);
-          } else {
-            toast({
-              variant: "destructive",
-              title: "Analysis Failed",
-              description: "The AI could not parse this document. Please try a different resume format.",
-            });
-          }
-        } finally {
-          setIsAnalyzing(false);
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Analysis Failed",
+            description: "The AI could not parse this document. Please try a different format (PDF/DOCX).",
+          });
         }
-      };
-      reader.readAsAsDataURL(file);
-    } catch (error) {
+      } finally {
+        setIsAnalyzing(false);
+      }
+    };
+
+    reader.onerror = () => {
       setIsAnalyzing(false);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred reading the file.",
+        title: "File Read Error",
+        description: "Could not read the file from your device.",
       });
-    }
+    };
+
+    // FIX: Corrected typo readAsAsDataURL -> readAsDataURL
+    reader.readAsDataURL(file);
   };
 
   const handleApprove = () => {
@@ -98,7 +105,7 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
       yearsOfExperience: Number(result.extractedInfo.yearsOfExperience) || 0,
       matchScore: Number(result.matchScore) || 0,
       currentStage: "Shortlisted",
-      jobId: "default-job-id", // In a real app, this would be linked to a selected job
+      jobId: "default-job-id",
       resumeDataUri: result.resumeDataUri || "",
       appliedDate: new Date().toISOString(),
       interviewStatus: "none",
@@ -114,7 +121,7 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
         });
         router.push("/dashboard/candidates");
       })
-      .catch(async (serverError) => {
+      .catch((serverError) => {
         const permissionError = new FirestorePermissionError({
           path: candidatesCol.path,
           operation: 'create',
@@ -132,7 +139,7 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
           <RefreshCw className="h-4 w-4 animate-spin text-amber-600" />
           <AlertTitle>AI Quota Cooling Down</AlertTitle>
           <AlertDescription className="text-sm">
-            Gemini Free Tier has a limit of 15 requests/min. Please wait <strong>{quotaWait}s</strong> before analyzing another file.
+            Gemini Free Tier has a limit. Please wait <strong>{quotaWait}s</strong> before analyzing another file.
           </AlertDescription>
         </Alert>
       )}
