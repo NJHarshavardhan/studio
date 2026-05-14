@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useParams } from "next/navigation";
@@ -5,7 +6,7 @@ import { useDoc } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { useFirestore } from "@/firebase";
 import { InterviewSession } from "@/components/ai/interview-session";
-import { Bot, Loader2, AlertCircle, ChevronLeft } from "lucide-react";
+import { Bot, AlertCircle, ChevronLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -22,8 +23,6 @@ export default function PublicInterviewPage() {
 
   const { data: candidate, loading, error } = useDoc(candidateRef);
 
-  // We only show the error if we are NOT loading AND (we have an error OR candidate is null)
-  // But we must also wait for firestore to be defined before we say "not found"
   const isInitializing = loading || !firestore;
   const isNotFound = !isInitializing && (error || !candidate);
 
@@ -87,7 +86,7 @@ export default function PublicInterviewPage() {
                Welcome, {candidate?.name}
              </h1>
              <p className="text-slate-500 max-w-lg mx-auto text-lg">
-               You are starting the AI technical screening for the <span className="text-primary font-bold">Senior Software Engineer</span> position.
+               You are starting the AI technical screening for your position.
              </p>
            </div>
         </div>
@@ -96,9 +95,10 @@ export default function PublicInterviewPage() {
           <div className="absolute -inset-4 bg-primary/5 rounded-[40px] blur-2xl" />
           <div className="relative">
             <InterviewSession 
-              jobDescription="Senior Software Engineer with focus on React, Next.js, Cloud architecture, and strong leadership skills." 
+              jobDescription="General dynamic technical and behavioral screening based on candidate profile." 
               resumeText={`Candidate Name: ${candidate?.name}. Experience reported: ${candidate?.yearsOfExperience} years. Email: ${candidate?.email}.`}
-              candidateId={candidate?.id}
+              candidateId={id as string}
+              jobId={candidate?.jobId || "default-job-id"}
             />
           </div>
         </div>
