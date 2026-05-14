@@ -25,9 +25,9 @@ export type AiResumeMatcherAndAnalyzerInput = z.infer<typeof AiResumeMatcherAndA
 const AiResumeMatcherAndAnalyzerOutputSchema = z.object({
   extractedInfo: z.object({
     name: z.string().describe("The candidate's full name."),
-    email: z.string().describe("The candidate's email address."),
+    email: z.string().describe("The candidate's clean email address (e.g., 'john@example.com'). Do not include names or labels."),
     phone: z.string().describe("The candidate's phone number."),
-    yearsOfExperience: z.coerce.number().describe('The total number of years of professional experience as a number (e.g. 5).'),
+    yearsOfExperience: z.coerce.number().describe('The total number of years of professional experience as a number.'),
     skills: z.array(z.string()).describe('A list of key skills extracted from the resume.'),
     experience: z
       .string()
@@ -77,10 +77,10 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert HR analyst and recruitment AI. Your task is to meticulously analyze a candidate's resume and compare it against a provided job description.
 
 **CRITICAL INSTRUCTIONS:**
-- You MUST extract the name, email, and phone number exactly as they appear.
-- For "yearsOfExperience", return ONLY the number. If they have 5.5 years, return 5.5.
+- You MUST extract the "email" as a clean string containing ONLY the email address (no names or extra characters).
+- For "yearsOfExperience", return ONLY the number.
 - For "matchScore", return a number between 0 and 100.
-- If certain information is missing (like phone), return "Not provided".
+- If information is missing, return "Not provided" for strings or 0 for numbers.
 
 **Job Description:**
 {{{jobDescription}}}
@@ -98,15 +98,10 @@ const aiResumeMatcherAndAnalyzerFlow = ai.defineFlow(
     outputSchema: AiResumeMatcherAndAnalyzerOutputSchema,
   },
   async input => {
-    try {
-      const {output} = await prompt(input);
-      if (!output) {
-        throw new Error('AI model failed to generate a response.');
-      }
-      return output;
-    } catch (error) {
-      console.error('Error in aiResumeMatcherAndAnalyzerFlow:', error);
-      throw error;
+    const {output} = await prompt(input);
+    if (!output) {
+      throw new Error('AI model failed to generate a response.');
     }
+    return output;
   }
 );

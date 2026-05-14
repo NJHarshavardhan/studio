@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react";
@@ -98,9 +97,11 @@ export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: Res
     if (!result || !firestore) return;
     setIsApproving(true);
 
+    const cleanEmail = result.extractedInfo.email.toLowerCase().trim();
+    
     const candidateData = {
       name: result.extractedInfo.name || "Unknown Candidate",
-      email: result.extractedInfo.email?.toLowerCase().trim() || "",
+      email: cleanEmail,
       phone: result.extractedInfo.phone || "Not provided",
       yearsOfExperience: Number(result.extractedInfo.yearsOfExperience) || 0,
       matchScore: Number(result.matchScore) || 0,
@@ -113,8 +114,14 @@ export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: Res
 
     const candidatesCol = collection(firestore, "candidates");
 
-    // Initiate the write operation (non-blocking)
     addDoc(candidatesCol, candidateData)
+      .then(() => {
+        toast({
+          title: "Candidate Shortlisted",
+          description: `${candidateData.name} has been added successfully.`,
+        });
+        router.push("/dashboard/candidates");
+      })
       .catch((serverError) => {
         const permissionError = new FirestorePermissionError({
           path: candidatesCol.path,
@@ -122,17 +129,8 @@ export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: Res
           requestResourceData: candidateData,
         } satisfies SecurityRuleContext);
         errorEmitter.emit('permission-error', permissionError);
-        setIsApproving(false); // Reset loading state if it fails
+        setIsApproving(false);
       });
-
-    // Optimistically provide feedback and navigate
-    toast({
-      title: "Candidate Shortlisted",
-      description: `${candidateData.name} has been added to the database.`,
-    });
-    
-    // Immediate navigation to prevent button hang
-    router.push("/dashboard/candidates");
   };
 
   return (

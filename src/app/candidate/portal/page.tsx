@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,10 +16,12 @@ export default function CandidatePortal() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const firestore = useFirestore();
 
+  const cleanEmail = useMemo(() => email.toLowerCase().trim(), [email]);
+
   const candidatesQuery = useMemoFirebase(() => {
-    if (!firestore || !email || !isLoggedIn) return null;
-    return query(collection(firestore, "candidates"), where("email", "==", email.toLowerCase().trim()));
-  }, [firestore, email, isLoggedIn]);
+    if (!firestore || !cleanEmail || !isLoggedIn) return null;
+    return query(collection(firestore, "candidates"), where("email", "==", cleanEmail));
+  }, [firestore, cleanEmail, isLoggedIn]);
 
   const { data: applications, loading } = useCollection(candidatesQuery);
 
@@ -27,7 +29,8 @@ export default function CandidatePortal() {
     return applications?.[0];
   }, [applications]);
 
-  const isActuallyLoading = loading && firestore && isLoggedIn;
+  // Handle local loading vs firestore loading
+  const showLoading = (loading || !firestore) && isLoggedIn;
 
   if (!isLoggedIn) {
     return (
@@ -71,7 +74,7 @@ export default function CandidatePortal() {
         <div className="flex items-center gap-4">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-semibold">{activeApplication?.name || "Candidate"}</p>
-            <p className="text-[10px] text-slate-500">{email}</p>
+            <p className="text-[10px] text-slate-500">{cleanEmail}</p>
           </div>
           <Button variant="ghost" size="sm" onClick={() => { setIsLoggedIn(false); setEmail(""); }}>
             <LogOut className="h-4 w-4 mr-2" /> Sign Out
@@ -86,7 +89,7 @@ export default function CandidatePortal() {
             <p className="text-slate-500 mt-1">Track your progress in our automated recruitment pipeline.</p>
           </div>
 
-          {isActuallyLoading ? (
+          {showLoading ? (
             <div className="flex flex-col items-center justify-center p-20 bg-white rounded-3xl border border-dashed">
               <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
               <p className="text-slate-500 animate-pulse">Retrieving application details...</p>
@@ -101,8 +104,8 @@ export default function CandidatePortal() {
                         <Briefcase className="h-6 w-6" />
                       </div>
                       <div>
-                        <CardTitle className="text-xl">Senior Software Engineer</CardTitle>
-                        <CardDescription>HireStack Inc. • Remote</CardDescription>
+                        <CardTitle className="text-xl">Application Update</CardTitle>
+                        <CardDescription>Status for: {activeApplication.email}</CardDescription>
                       </div>
                     </div>
                     <Badge className="bg-blue-50 text-blue-700 border-none px-4 py-1.5 rounded-full">
@@ -191,7 +194,7 @@ export default function CandidatePortal() {
               <Search className="h-12 w-12 text-slate-200 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-slate-900">No Application Found</h3>
               <p className="text-slate-500 max-w-sm mx-auto mt-2">
-                We couldn't find any active applications for <strong>{email}</strong>. Please ensure you entered the correct email.
+                We couldn't find any active applications for <strong>{cleanEmail}</strong>. Please ensure you entered the correct email.
               </p>
               <Button variant="outline" className="mt-8" onClick={() => { setIsLoggedIn(false); setEmail(""); }}>
                 Try Another Email
