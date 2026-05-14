@@ -6,15 +6,33 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Info } from "lucide-react";
+import { Info, Briefcase, Loader2 } from "lucide-react";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { collection } from "firebase/firestore";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function ScreeningPage() {
+  const [selectedJobId, setSelectedJobId] = useState<string>("");
   const [jd, setJd] = useState(`We are looking for a Senior React Developer with 5+ years of experience.
 Key Requirements:
 - Expert knowledge of React and Next.js
 - Proficiency in TypeScript and Tailwind CSS
 - Experience with Server-side rendering and performance optimization
 - Good communication skills`);
+
+  const firestore = useFirestore();
+  const jobsRef = useMemoFirebase(() => firestore ? collection(firestore, "jobs") : null, [firestore]);
+  const { data: jobs, loading: loadingJobs } = useCollection(jobsRef);
+
+  const selectedJob = jobs?.find(j => j.id === selectedJobId);
+
+  const handleJobChange = (jobId: string) => {
+    setSelectedJobId(jobId);
+    const job = jobs?.find(j => j.id === jobId);
+    if (job) {
+      setJd(job.description || "");
+    }
+  };
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
@@ -33,20 +51,48 @@ Key Requirements:
         </AlertDescription>
       </Alert>
 
-      <div className="space-y-4">
-        <div className="grid w-full gap-2">
-          <Label htmlFor="jd" className="text-slate-900 font-semibold">Job Description</Label>
-          <Textarea 
-            id="jd" 
-            placeholder="Paste your job description here..." 
-            className="min-h-[200px] bg-white"
-            value={jd}
-            onChange={(e) => setJd(e.target.value)}
-          />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="md:col-span-1 space-y-6">
+          <div className="space-y-2">
+            <Label className="text-slate-900 font-semibold flex items-center gap-2">
+              <Briefcase className="h-4 w-4" /> Select Target Job
+            </Label>
+            {loadingJobs ? (
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <Loader2 className="h-3 w-3 animate-spin" /> Loading jobs...
+              </div>
+            ) : (
+              <Select onValueChange={handleJobChange} value={selectedJobId}>
+                <SelectTrigger className="bg-white">
+                  <SelectValue placeholder="Choose a position..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {jobs?.map((job: any) => (
+                    <SelectItem key={job.id} value={job.id}>{job.title}</SelectItem>
+                  ))}
+                  {jobs?.length === 0 && (
+                    <SelectItem value="none" disabled>No active jobs found</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            )}
+            <p className="text-[10px] text-slate-400">Selecting a job will automatically load its description.</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="jd" className="text-slate-900 font-semibold">Job Description</Label>
+            <Textarea 
+              id="jd" 
+              placeholder="Paste your job description here..." 
+              className="min-h-[300px] bg-white text-sm leading-relaxed"
+              value={jd}
+              onChange={(e) => setJd(e.target.value)}
+            />
+          </div>
         </div>
 
-        <div className="pt-4">
-          <ResumeAnalyzer jobDescription={jd} />
+        <div className="md:col-span-2">
+          <ResumeAnalyzer jobDescription={jd} jobId={selectedJobId || "manual-entry"} />
         </div>
       </div>
     </div>

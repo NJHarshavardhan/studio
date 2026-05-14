@@ -18,9 +18,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface ResumeAnalyzerProps {
   jobDescription: string;
+  jobId?: string;
 }
 
-export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
+export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: ResumeAnalyzerProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
   const [quotaWait, setQuotaWait] = useState<number | null>(null);
@@ -90,7 +91,6 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
       });
     };
 
-    // FIX: Corrected typo readAsAsDataURL -> readAsDataURL
     reader.readAsDataURL(file);
   };
 
@@ -99,13 +99,13 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
     setIsApproving(true);
 
     const candidateData = {
-      name: result.extractedInfo.name,
-      email: result.extractedInfo.email.toLowerCase().trim(),
+      name: result.extractedInfo.name || "Unknown Candidate",
+      email: result.extractedInfo.email?.toLowerCase().trim() || "",
       phone: result.extractedInfo.phone || "Not provided",
       yearsOfExperience: Number(result.extractedInfo.yearsOfExperience) || 0,
       matchScore: Number(result.matchScore) || 0,
       currentStage: "Shortlisted",
-      jobId: "default-job-id",
+      jobId: jobId,
       resumeDataUri: result.resumeDataUri || "",
       appliedDate: new Date().toISOString(),
       interviewStatus: "none",
@@ -113,14 +113,8 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
 
     const candidatesCol = collection(firestore, "candidates");
 
+    // Initiate the write operation (non-blocking)
     addDoc(candidatesCol, candidateData)
-      .then(() => {
-        toast({
-          title: "Candidate Shortlisted",
-          description: `${result.extractedInfo.name} has been added to the database.`,
-        });
-        router.push("/dashboard/candidates");
-      })
       .catch((serverError) => {
         const permissionError = new FirestorePermissionError({
           path: candidatesCol.path,
@@ -128,8 +122,17 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
           requestResourceData: candidateData,
         } satisfies SecurityRuleContext);
         errorEmitter.emit('permission-error', permissionError);
-      })
-      .finally(() => setIsApproving(false));
+        setIsApproving(false); // Reset loading state if it fails
+      });
+
+    // Optimistically provide feedback and navigate
+    toast({
+      title: "Candidate Shortlisted",
+      description: `${candidateData.name} has been added to the database.`,
+    });
+    
+    // Immediate navigation to prevent button hang
+    router.push("/dashboard/candidates");
   };
 
   return (
@@ -189,10 +192,10 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                  <div className="flex items-center gap-4">
                    <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl">
-                     {result.extractedInfo.name[0] || 'C'}
+                     {result.extractedInfo.name ? result.extractedInfo.name[0] : 'C'}
                    </div>
                    <div>
-                     <CardTitle className="text-2xl">{result.extractedInfo.name}</CardTitle>
+                     <CardTitle className="text-2xl">{result.extractedInfo.name || "Extracted Candidate"}</CardTitle>
                      <div className="flex flex-wrap gap-x-6 gap-y-1 mt-1">
                         <span className="text-sm text-slate-500 flex items-center gap-1.5">
                           <Mail className="h-3.5 w-3.5" /> {result.extractedInfo.email}

@@ -16,16 +16,17 @@ import {
   Send,
   Loader2,
   Copy,
-  Check
+  Check,
+  Briefcase
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useFirestore, useCollection } from "@/firebase";
-import { collection, updateDoc, doc, addDoc } from "firebase/firestore";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { collection, updateDoc, doc, addDoc, query } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { sendRecruitmentEmail } from "@/ai/flows/send-recruitment-email";
-import type { Candidate, PipelineStage } from "@/lib/types";
+import type { PipelineStage } from "@/lib/types";
 
 const STAGES: PipelineStage[] = [
   "Applied",
@@ -43,8 +44,11 @@ export default function CandidatesPipeline() {
   const firestore = useFirestore();
   const { toast } = useToast();
   
-  const candidatesRef = useMemo(() => firestore ? collection(firestore, "candidates") : null, [firestore]);
-  const { data: candidates, loading } = useCollection(candidatesRef);
+  const candidatesRef = useMemoFirebase(() => firestore ? collection(firestore, "candidates") : null, [firestore]);
+  const { data: candidates, loading: loadingCandidates } = useCollection(candidatesRef);
+
+  const jobsRef = useMemoFirebase(() => firestore ? collection(firestore, "jobs") : null, [firestore]);
+  const { data: jobs } = useCollection(jobsRef);
 
   const filteredCandidates = candidates?.filter(c => 
     c.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -72,7 +76,7 @@ export default function CandidatesPipeline() {
         candidateName: candidate.name,
         candidateEmail: candidate.email,
         type: 'interview_invite',
-        jobTitle: 'Senior Developer'
+        jobTitle: jobs?.find(j => j.id === candidate.jobId)?.title || 'Software Engineer'
       });
 
       const emailsCol = collection(firestore, "emails");
@@ -120,7 +124,7 @@ export default function CandidatesPipeline() {
     }
   };
 
-  if (loading) {
+  if (loadingCandidates) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -177,14 +181,21 @@ export default function CandidatesPipeline() {
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start mb-2">
                         <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
-                          {candidate.name?.split(' ').map((n: string) => n[0]).join('')}
+                          {candidate.name ? candidate.name.split(' ').map((n: string) => n[0]).join('') : 'C'}
                         </div>
                         <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100">
                           <MoreVertical className="h-3 w-3" />
                         </Button>
                       </div>
-                      <h4 className="text-sm font-semibold text-slate-900">{candidate.name}</h4>
-                      <p className="text-[10px] text-slate-500 truncate mb-2">{candidate.email}</p>
+                      <h4 className="text-sm font-semibold text-slate-900 truncate">{candidate.name}</h4>
+                      <p className="text-[10px] text-slate-500 truncate mb-1">{candidate.email}</p>
+                      
+                      <div className="flex items-center gap-1 mb-3">
+                        <Briefcase className="h-3 w-3 text-slate-400" />
+                        <span className="text-[10px] text-slate-500 font-medium truncate">
+                          {jobs?.find(j => j.id === candidate.jobId)?.title || "General Application"}
+                        </span>
+                      </div>
                       
                       {stage === "Shortlisted" && (
                          <Button 
@@ -225,7 +236,7 @@ export default function CandidatesPipeline() {
                       <div className="mt-4 pt-4 border-t flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                           <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                          <span className="text-[10px] font-bold text-emerald-600">{candidate.matchScore}% Match</span>
+                          <span className="text-[10px] font-bold text-emerald-600">{candidate.matchScore || 0}% Match</span>
                         </div>
                         <div className="flex items-center gap-2">
                            <FileText className="h-3 w-3 text-slate-400" />
