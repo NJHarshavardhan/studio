@@ -20,7 +20,7 @@ export function useDoc<T = DocumentData>(
 
   useEffect(() => {
     if (!docRef) {
-      setLoading(false);
+      // Keep loading true while waiting for a reference
       return;
     }
 
@@ -28,7 +28,7 @@ export function useDoc<T = DocumentData>(
     const unsubscribe = onSnapshot(
       docRef,
       (snapshot: DocumentSnapshot<T>) => {
-        setData(snapshot.exists() ? { ...snapshot.data(), id: snapshot.id } : null);
+        setData(snapshot.exists() ? ({ ...snapshot.data(), id: snapshot.id } as any) : null);
         setLoading(false);
       },
       async (err: FirestoreError) => {

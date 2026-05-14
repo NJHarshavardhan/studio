@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useParams } from "next/navigation";
@@ -23,8 +22,12 @@ export default function PublicInterviewPage() {
 
   const { data: candidate, loading, error } = useDoc(candidateRef);
 
+  // We are initializing if we are loading OR if firestore isn't ready
+  // OR if we have no candidate yet but we haven't confirmed it's missing (loading is true)
   const isInitializing = loading || !firestore;
-  const isNotFound = !isInitializing && (error || !candidate);
+  
+  // NotFound is only confirmed if we finished loading and candidate is truly null
+  const isNotFound = !isInitializing && !candidate;
   const isCompleted = !isInitializing && candidate?.interviewStatus === "completed";
 
   if (isInitializing) {

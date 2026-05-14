@@ -20,7 +20,9 @@ export function useCollection<T = DocumentData>(
 
   useEffect(() => {
     if (!query) {
-      setLoading(false);
+      // If no query is provided, we stay in a loading state if we expect one,
+      // or we could set it to false if we know it's intentionally null.
+      // For HireStack, we usually wait for firestore to be ready.
       return;
     }
 
@@ -29,9 +31,9 @@ export function useCollection<T = DocumentData>(
       query,
       (snapshot: QuerySnapshot<T>) => {
         const items = snapshot.docs.map((doc) => ({
-          ...doc.data(),
+          ...(doc.data() as any),
           id: doc.id,
-        }));
+        })) as (T & { id: string })[];
         setData(items);
         setLoading(false);
       },
