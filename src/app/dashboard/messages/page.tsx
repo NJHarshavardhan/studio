@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useMemo, useState } from "react";
@@ -12,6 +11,7 @@ import { collection, query, orderBy } from "firebase/firestore";
 import { useMemoFirebase } from "@/firebase";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function MessagesPage() {
   const [selectedEmail, setSelectedEmail] = useState<any>(null);
@@ -53,9 +53,16 @@ export default function MessagesPage() {
           <ScrollArea className="flex-1">
             <div className="divide-y divide-slate-100">
               {loading ? (
-                <div className="p-12 flex justify-center">
-                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                </div>
+                Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="p-4 space-y-3">
+                    <div className="flex justify-between">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-3 w-16" />
+                    </div>
+                    <Skeleton className="h-3 w-3/4" />
+                    <Skeleton className="h-4 w-20 rounded-full" />
+                  </div>
+                ))
               ) : emails?.length === 0 ? (
                 <div className="p-8 text-center text-slate-400 text-sm italic">
                   No messages sent yet.

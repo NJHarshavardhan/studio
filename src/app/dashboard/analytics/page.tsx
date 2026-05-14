@@ -17,6 +17,7 @@ import {
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
 import { Loader2, PieChart as PieChartIcon, TrendingUp, Users, Target } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
 
@@ -60,21 +61,8 @@ export default function AnalyticsPage() {
     return brackets;
   }, [interviews]);
 
-  // If firestore isn't even initialized yet, we definitely show loader
   const isInitializing = !firestore;
-  // If hooks are loading, show loader
   const isLoading = isInitializing || loadingCandidates || loadingInterviews;
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-[calc(100vh-200px)]">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-slate-400 font-medium">Crunching your recruitment data...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -84,47 +72,23 @@ export default function AnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-none shadow-sm">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-xs uppercase font-bold tracking-wider">Avg. Match Score</CardDescription>
-            <CardTitle className="text-3xl font-bold text-blue-600">
-              {candidates?.length 
-                ? Math.round(candidates.reduce((acc, curr: any) => acc + (curr.matchScore || 0), 0) / candidates.length) 
-                : 0}%
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium">
-              <TrendingUp className="h-3 w-3" /> +5.2% from last month
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-none shadow-sm">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-xs uppercase font-bold tracking-wider">Interview Conversion</CardDescription>
-            <CardTitle className="text-3xl font-bold text-indigo-600">
-              {candidates?.length 
-                ? Math.round((candidates.filter((c: any) => c.currentStage === "Selected").length / candidates.length) * 100) 
-                : 0}%
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
-              <Target className="h-3 w-3" /> Target: 15%
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-none shadow-sm">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-xs uppercase font-bold tracking-wider">Total Throughput</CardDescription>
-            <CardTitle className="text-3xl font-bold text-purple-600">{candidates?.length || 0}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
-              <Users className="h-3 w-3" /> Applications processed
-            </div>
-          </CardContent>
-        </Card>
+        {[1, 2, 3].map((i) => (
+          <Card key={i} className="border-none shadow-sm">
+            <CardHeader className="pb-2">
+              <Skeleton className="h-3 w-24 mb-2" />
+              {isLoading ? <Skeleton className="h-10 w-20" /> : (
+                <CardTitle className="text-3xl font-bold">
+                  {i === 1 ? (candidates?.length ? Math.round(candidates.reduce((acc, curr: any) => acc + (curr.matchScore || 0), 0) / candidates.length) : 0) + "%" :
+                   i === 2 ? (candidates?.length ? Math.round((candidates.filter((c: any) => c.currentStage === "Selected").length / candidates.length) * 100) : 0) + "%" :
+                   candidates?.length || 0}
+                </CardTitle>
+              )}
+            </CardHeader>
+            <CardContent>
+               <Skeleton className="h-4 w-32" />
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -136,7 +100,16 @@ export default function AnalyticsPage() {
             <CardDescription>Distribution of candidates across pipeline stages</CardDescription>
           </CardHeader>
           <CardContent className="h-[350px]">
-            {candidates?.length ? (
+            {isLoading ? (
+              <div className="space-y-4 h-full flex flex-col justify-center">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-4 flex-1" style={{ width: `${Math.random() * 50 + 20}%` }} />
+                  </div>
+                ))}
+              </div>
+            ) : candidates?.length ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={pipelineData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#f1f5f9" />
@@ -165,7 +138,12 @@ export default function AnalyticsPage() {
             <CardDescription>Performance breakdown of AI screening sessions</CardDescription>
           </CardHeader>
           <CardContent className="h-[350px] flex items-center justify-center">
-            {interviews?.length ? (
+            {isLoading ? (
+              <div className="relative h-48 w-48 flex items-center justify-center">
+                 <Skeleton className="h-full w-full rounded-full" />
+                 <div className="absolute h-32 w-32 rounded-full bg-background" />
+              </div>
+            ) : interviews?.length ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie

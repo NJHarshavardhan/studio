@@ -44,6 +44,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const STAGES: PipelineStage[] = [
   "Applied",
@@ -168,14 +169,6 @@ export default function CandidatesPipeline() {
     }
   };
 
-  if (loadingCandidates) {
-    return (
-      <div className="flex items-center justify-center h-[50vh]">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-8 pb-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -256,13 +249,32 @@ export default function CandidatesPipeline() {
               <div className="flex items-center gap-3">
                 <h3 className="font-black text-foreground text-sm uppercase tracking-widest">{stage}</h3>
                 <span className="bg-primary/10 text-primary text-[10px] font-black px-2 py-0.5 rounded-full">
-                  {filteredCandidates.filter(c => c.currentStage === stage).length}
+                  {loadingCandidates ? "..." : filteredCandidates.filter(c => c.currentStage === stage).length}
                 </span>
               </div>
             </div>
             
             <div className="space-y-4 min-h-[600px] bg-muted/30 rounded-[32px] p-4 border-2 border-dashed border-muted">
-              {filteredCandidates
+              {loadingCandidates ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <Card key={i} className="shadow-sm border-none rounded-2xl overflow-hidden p-5 space-y-4 bg-card">
+                    <div className="flex justify-between items-start">
+                      <Skeleton className="h-10 w-10 rounded-2xl" />
+                      <Skeleton className="h-8 w-8 rounded-xl" />
+                    </div>
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                    <Skeleton className="h-4 w-1/3" />
+                    <Skeleton className="h-9 w-full rounded-xl" />
+                    <div className="flex justify-between pt-4 border-t">
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-4 w-8" />
+                    </div>
+                  </Card>
+                ))
+              ) : filteredCandidates
                 .filter(c => c.currentStage === stage)
                 .map((candidate) => (
                   <Card key={candidate.id} className="group cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all shadow-sm bg-card border-none rounded-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300">

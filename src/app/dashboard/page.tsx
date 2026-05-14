@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Users, Briefcase, Bot, CheckCircle2, TrendingUp, Clock, Loader2, Database, Sparkles, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Users, Briefcase, Bot, CheckCircle2, TrendingUp, Clock, Loader2, Database, Sparkles, ArrowUpRight, ArrowDownRight, PieChart } from "lucide-react";
 import { 
   BarChart, 
   Bar, 
@@ -19,6 +19,7 @@ import { collection, query, orderBy, limit, addDoc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const data = [
   { name: 'Mon', applications: 40, interviews: 24 },
@@ -97,6 +98,8 @@ export default function Dashboard() {
     }
   };
 
+  const isLoading = loadingAll || !firestore;
+
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -128,19 +131,23 @@ export default function Dashboard() {
                 <div className={cn("p-2.5 rounded-xl transition-transform group-hover:scale-110", stat.bg)}>
                   <stat.icon className={cn("h-5 w-5", stat.color)} />
                 </div>
-                <div className={cn(
-                  "flex items-center gap-0.5 text-xs font-bold px-2 py-1 rounded-full",
-                  stat.isUp ? "bg-emerald-500/10 text-emerald-600" : "bg-red-500/10 text-red-600"
-                )}>
-                  {stat.isUp ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-                  {stat.trend}
-                </div>
+                {isLoading ? <Skeleton className="h-6 w-16 rounded-full" /> : (
+                  <div className={cn(
+                    "flex items-center gap-0.5 text-xs font-bold px-2 py-1 rounded-full",
+                    stat.isUp ? "bg-emerald-500/10 text-emerald-600" : "bg-red-500/10 text-red-600"
+                  )}>
+                    {stat.isUp ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                    {stat.trend}
+                  </div>
+                )}
               </div>
               <div className="mt-5">
                 <h3 className="text-sm font-semibold text-muted-foreground tracking-tight">{stat.title}</h3>
-                <p className="text-3xl font-black text-foreground mt-1 tabular-nums">
-                  {loadingAll ? "..." : stat.value}
-                </p>
+                {isLoading ? <Skeleton className="h-10 w-20 mt-1" /> : (
+                  <p className="text-3xl font-black text-foreground mt-1 tabular-nums">
+                    {stat.value}
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -154,29 +161,38 @@ export default function Dashboard() {
             <CardDescription>Daily recruitment throughput across stages</CardDescription>
           </CardHeader>
           <CardContent className="h-[300px] mt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data}>
-                <defs>
-                  <linearGradient id="colorFlow" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} dy={10} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip 
-                  contentStyle={{ 
-                    borderRadius: '16px', 
-                    border: 'none', 
-                    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
-                    backgroundColor: 'hsl(var(--card))',
-                    color: 'hsl(var(--card-foreground))'
-                  }}
-                />
-                <Area type="monotone" dataKey="applications" stroke="hsl(var(--primary))" strokeWidth={3} fillOpacity={1} fill="url(#colorFlow)" />
-              </AreaChart>
-            </ResponsiveContainer>
+            {isLoading ? (
+              <div className="w-full h-full flex flex-col gap-4">
+                <Skeleton className="w-full flex-1" />
+                <div className="flex justify-between">
+                   {[1,2,3,4,5,6,7].map(i => <Skeleton key={i} className="h-4 w-8" />)}
+                </div>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={data}>
+                  <defs>
+                    <linearGradient id="colorFlow" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} dy={10} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      borderRadius: '16px', 
+                      border: 'none', 
+                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                      backgroundColor: 'hsl(var(--card))',
+                      color: 'hsl(var(--card-foreground))'
+                    }}
+                  />
+                  <Area type="monotone" dataKey="applications" stroke="hsl(var(--primary))" strokeWidth={3} fillOpacity={1} fill="url(#colorFlow)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
 
@@ -186,22 +202,33 @@ export default function Dashboard() {
             <CardDescription>AI Interview completion trends</CardDescription>
           </CardHeader>
           <CardContent className="h-[300px] mt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} dy={10} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip 
-                   contentStyle={{ 
-                    borderRadius: '16px', 
-                    border: 'none', 
-                    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
-                    backgroundColor: 'hsl(var(--card))'
-                  }}
-                />
-                <Bar dataKey="interviews" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} barSize={40} />
-              </BarChart>
-            </ResponsiveContainer>
+             {isLoading ? (
+              <div className="w-full h-full flex flex-col gap-4">
+                <div className="flex items-end justify-between flex-1 gap-2">
+                   {[1,2,3,4,5,6,7].map(i => <Skeleton key={i} className="w-full" style={{ height: `${Math.random() * 80 + 20}%` }} />)}
+                </div>
+                <div className="flex justify-between">
+                   {[1,2,3,4,5,6,7].map(i => <Skeleton key={i} className="h-4 w-8" />)}
+                </div>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} dy={10} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      borderRadius: '16px', 
+                      border: 'none', 
+                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                      backgroundColor: 'hsl(var(--card))'
+                    }}
+                  />
+                  <Bar dataKey="interviews" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} barSize={40} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -216,9 +243,21 @@ export default function Dashboard() {
           <CardContent className="p-0">
             <div className="divide-y">
               {loadingRecent ? (
-                <div className="flex justify-center py-20">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
+                Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex items-center justify-between p-6">
+                    <div className="flex items-center gap-4">
+                      <Skeleton className="h-12 w-12 rounded-2xl" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-20" />
+                      </div>
+                    </div>
+                    <div className="text-right space-y-2">
+                      <Skeleton className="h-6 w-12 ml-auto" />
+                      <Skeleton className="h-3 w-24 ml-auto" />
+                    </div>
+                  </div>
+                ))
               ) : recentCandidates?.map((report: any) => (
                 <div key={report.id} className="flex items-center justify-between p-6 hover:bg-muted/30 transition-colors group cursor-pointer">
                   <div className="flex items-center gap-4">
@@ -243,7 +282,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               ))}
-              {recentCandidates?.length === 0 && (
+              {!loadingRecent && recentCandidates?.length === 0 && (
                 <div className="text-center py-20">
                   <Users className="h-12 w-12 text-muted/30 mx-auto mb-4" />
                   <p className="text-muted-foreground italic text-sm">No recent matches found.</p>

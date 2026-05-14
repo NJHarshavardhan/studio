@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from "react";
@@ -15,6 +14,7 @@ import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function JobsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -133,9 +133,28 @@ export default function JobsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
-          <div className="col-span-full py-20 flex justify-center">
-            <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          </div>
+          Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i} className="border-none shadow-sm space-y-4 p-6 bg-card">
+              <div className="flex justify-between items-start">
+                <Skeleton className="h-9 w-9 rounded-lg" />
+                <Skeleton className="h-8 w-8 rounded-full" />
+              </div>
+              <Skeleton className="h-6 w-3/4" />
+              <div className="flex gap-4">
+                <Skeleton className="h-3 w-20" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-2/3" />
+              </div>
+              <div className="flex justify-between items-center pt-4 border-t">
+                <Skeleton className="h-5 w-16 rounded-full" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+            </Card>
+          ))
         ) : jobs?.map((job: any) => (
           <Card key={job.id} className="border-none shadow-sm hover:shadow-md transition-shadow group">
             <CardHeader>

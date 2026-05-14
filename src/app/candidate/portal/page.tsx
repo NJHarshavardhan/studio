@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { useFirestore, useCollection } from "@/firebase";
 import { collection, query, where } from "firebase/firestore";
 import { useMemoFirebase } from "@/firebase";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CandidatePortal() {
   const [email, setEmail] = useState("");
@@ -73,7 +74,7 @@ export default function CandidatePortal() {
         </Link>
         <div className="flex items-center gap-4">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-semibold">{activeApplication?.name || "Candidate"}</p>
+            {showLoading ? <Skeleton className="h-4 w-24" /> : <p className="text-sm font-semibold">{activeApplication?.name || "Candidate"}</p>}
             <p className="text-[10px] text-slate-500">{cleanEmail}</p>
           </div>
           <Button variant="ghost" size="sm" onClick={() => { setIsLoggedIn(false); setEmail(""); }}>
@@ -90,10 +91,33 @@ export default function CandidatePortal() {
           </div>
 
           {showLoading ? (
-            <div className="flex flex-col items-center justify-center p-20 bg-white rounded-3xl border border-dashed">
-              <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
-              <p className="text-slate-500 animate-pulse">Retrieving application details...</p>
-            </div>
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+               <Card className="md:col-span-2 border-none shadow-sm p-8 space-y-8 bg-white">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-4">
+                      <Skeleton className="h-12 w-12 rounded-2xl" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-5 w-32" />
+                        <Skeleton className="h-4 w-48" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-8 w-24 rounded-full" />
+                  </div>
+                  <div className="space-y-10 relative">
+                    <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-slate-100" />
+                    {[1, 2, 3, 4].map(i => (
+                      <div key={i} className="flex gap-6 items-start">
+                        <Skeleton className="h-8 w-8 rounded-full z-10" />
+                        <div className="space-y-2 flex-1">
+                          <Skeleton className="h-4 w-24" />
+                          <Skeleton className="h-3 w-full" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+               </Card>
+               <Skeleton className="h-[300px] rounded-2xl" />
+             </div>
           ) : activeApplication ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <Card className="md:col-span-2 border-none shadow-sm overflow-hidden">
