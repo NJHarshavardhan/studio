@@ -115,7 +115,7 @@ export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: Res
 
     const candidatesCol = collection(firestore, "candidates");
 
-    // Optimistic write: Initiate and then navigate
+    // NON-BLOCKING MUTATION: Initiate the write and immediately proceed
     addDoc(candidatesCol, candidateData)
       .catch((serverError) => {
         const permissionError = new FirestorePermissionError({
@@ -131,7 +131,7 @@ export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: Res
       description: `${candidateData.name} has been added successfully.`,
     });
     
-    // Immediate navigation for better UX
+    // Immediate optimistic navigation to prevent button hang
     router.push("/dashboard/candidates");
   };
 

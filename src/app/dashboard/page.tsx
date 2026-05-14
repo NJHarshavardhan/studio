@@ -87,7 +87,7 @@ export default function Dashboard() {
 
       toast({
         title: "Demo Data Seeded",
-        description: "A test job and candidate (test@example.com) have been created.",
+        description: "A test job and candidate (test@example.com) have been created. Check the Pipeline!",
       });
     } catch (error) {
       toast({
