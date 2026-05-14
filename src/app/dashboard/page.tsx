@@ -1,8 +1,9 @@
 
 "use client"
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Users, Briefcase, Bot, CheckCircle2, TrendingUp, Clock, Loader2 } from "lucide-react";
+import { Users, Briefcase, Bot, CheckCircle2, TrendingUp, Clock, Loader2, Database, Sparkles } from "lucide-react";
 import { 
   BarChart, 
   Bar, 
@@ -15,8 +16,10 @@ import {
   Area
 } from 'recharts';
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy, limit } from "firebase/firestore";
+import { collection, query, orderBy, limit, addDoc, serverTimestamp } from "firebase/firestore";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const data = [
   { name: 'Mon', applications: 40, interviews: 24 },
@@ -29,7 +32,9 @@ const data = [
 ];
 
 export default function Dashboard() {
+  const [isSeeding, setIsSeeding] = useState(false);
   const firestore = useFirestore();
+  const { toast } = useToast();
   
   const candidatesRef = useMemoFirebase(() => firestore ? collection(firestore, "candidates") : null, [firestore]);
   const jobsRef = useMemoFirebase(() => firestore ? collection(firestore, "jobs") : null, [firestore]);
@@ -53,11 +58,64 @@ export default function Dashboard() {
     { title: "Hired", value: candidates?.filter((c: any) => c.currentStage === "Selected").length || 0, icon: CheckCircle2, trend: "+2 this week", color: "text-emerald-600", bg: "bg-emerald-50" },
   ];
 
+  const seedDemoData = async () => {
+    if (!firestore) return;
+    setIsSeeding(true);
+    
+    try {
+      // Create a Demo Job
+      const jobRef = await addDoc(collection(firestore, "jobs"), {
+        title: "Demo Senior React Developer",
+        description: "We are looking for a Senior React Developer with 5+ years of experience in high-growth startups. Proficiency in Next.js and Firebase is required.",
+        location: "Remote",
+        status: "Open",
+        createdAt: new Date().toISOString()
+      });
+
+      // Create a Demo Candidate
+      await addDoc(collection(firestore, "candidates"), {
+        name: "Demo Candidate (Test)",
+        email: "test@example.com",
+        phone: "+1 555-0199",
+        yearsOfExperience: 6,
+        matchScore: 88,
+        currentStage: "Shortlisted",
+        jobId: jobRef.id,
+        appliedDate: new Date().toISOString(),
+        interviewStatus: "none"
+      });
+
+      toast({
+        title: "Demo Data Seeded",
+        description: "A test job and candidate (test@example.com) have been created.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Seeding Failed",
+        description: "Could not create demo data. Check your connection.",
+      });
+    } finally {
+      setIsSeeding(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Dashboard</h1>
-        <p className="text-slate-500">Welcome back, here's your recruitment overview powered by Firebase.</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Dashboard</h1>
+          <p className="text-slate-500">Welcome back, here's your recruitment overview powered by Firebase.</p>
+        </div>
+        <Button 
+          variant="outline" 
+          onClick={seedDemoData} 
+          disabled={isSeeding}
+          className="bg-white border-2 border-primary/20 hover:bg-primary/5 text-primary font-bold shadow-sm"
+        >
+          {isSeeding ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Database className="h-4 w-4 mr-2" />}
+          Seed Demo Data
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

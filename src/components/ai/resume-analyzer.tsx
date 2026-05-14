@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from "react";
@@ -114,14 +115,8 @@ export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: Res
 
     const candidatesCol = collection(firestore, "candidates");
 
+    // Optimistic write: Initiate and then navigate
     addDoc(candidatesCol, candidateData)
-      .then(() => {
-        toast({
-          title: "Candidate Shortlisted",
-          description: `${candidateData.name} has been added successfully.`,
-        });
-        router.push("/dashboard/candidates");
-      })
       .catch((serverError) => {
         const permissionError = new FirestorePermissionError({
           path: candidatesCol.path,
@@ -129,8 +124,15 @@ export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: Res
           requestResourceData: candidateData,
         } satisfies SecurityRuleContext);
         errorEmitter.emit('permission-error', permissionError);
-        setIsApproving(false);
       });
+
+    toast({
+      title: "Candidate Shortlisted",
+      description: `${candidateData.name} has been added successfully.`,
+    });
+    
+    // Immediate navigation for better UX
+    router.push("/dashboard/candidates");
   };
 
   return (
