@@ -21,12 +21,29 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, updateDoc, doc, addDoc, query } from "firebase/firestore";
+import { collection, updateDoc, doc, addDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
+import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 import { sendRecruitmentEmail } from "@/ai/flows/send-recruitment-email";
 import type { PipelineStage } from "@/lib/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const STAGES: PipelineStage[] = [
   "Applied",
@@ -41,6 +58,15 @@ export default function CandidatesPipeline() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSendingMail, setIsSendingMail] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [isManualAddOpen, setIsManualAddOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  
+  const [newCandidate, setNewCandidate] = useState({
+    name: "",
+    email: "",
+    jobId: "",
+  });
+
   const firestore = useFirestore();
   const { toast } = useToast();
   
@@ -64,6 +90,40 @@ export default function CandidatesPipeline() {
       description: "Candidate interview link is now in your clipboard.",
     });
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleManualAdd = async () => {
+    if (!newCandidate.name || !newCandidate.email || !newCandidate.jobId || !firestore) return;
+    setIsCreating(true);
+
+    const candidateData = {
+      name: newCandidate.name,
+      email: newCandidate.email.toLowerCase().trim(),
+      jobId: newCandidate.jobId,
+      currentStage: "Applied" as PipelineStage,
+      appliedDate: new Date().toISOString(),
+      matchScore: 0,
+      interviewStatus: "none",
+    };
+
+    addDoc(collection(firestore, "candidates"), candidateData)
+      .then(() => {
+        setIsManualAddOpen(false);
+        setNewCandidate({ name: "", email: "", jobId: "" });
+        toast({
+          title: "Candidate Added",
+          description: "New candidate has been successfully added to the pipeline.",
+        });
+      })
+      .catch((e) => {
+        const permissionError = new FirestorePermissionError({
+          path: "candidates",
+          operation: 'create',
+          requestResourceData: candidateData,
+        } satisfies SecurityRuleContext);
+        errorEmitter.emit('permission-error', permissionError);
+      })
+      .finally(() => setIsCreating(false));
   };
 
   const handleSendInterviewRequest = async (candidate: any) => {
@@ -143,9 +203,58 @@ export default function CandidatesPipeline() {
           <Button variant="outline" size="sm">
             <Filter className="h-4 w-4 mr-2" /> Filter
           </Button>
-          <Button size="sm">
-            <UserPlus className="h-4 w-4 mr-2" /> Add Candidate
-          </Button>
+          
+          <Dialog open={isManualAddOpen} onOpenChange={setIsManualAddOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm">
+                <UserPlus className="h-4 w-4 mr-2" /> Add Candidate
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Manual Candidate Entry</DialogTitle>
+                <DialogDescription>Add a candidate directly to the pipeline without AI screening.</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>Full Name</Label>
+                  <Input 
+                    placeholder="e.g. John Doe" 
+                    value={newCandidate.name} 
+                    onChange={(e) => setNewCandidate({...newCandidate, name: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Email Address</Label>
+                  <Input 
+                    type="email" 
+                    placeholder="john@example.com" 
+                    value={newCandidate.email}
+                    onChange={(e) => setNewCandidate({...newCandidate, email: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Target Job</Label>
+                  <Select onValueChange={(val) => setNewCandidate({...newCandidate, jobId: val})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a job position" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {jobs?.map(job => (
+                        <SelectItem key={job.id} value={job.id}>{job.title}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsManualAddOpen(false)}>Cancel</Button>
+                <Button onClick={handleManualAdd} disabled={isCreating || !newCandidate.name || !newCandidate.email || !newCandidate.jobId}>
+                  {isCreating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : "Add Candidate"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
