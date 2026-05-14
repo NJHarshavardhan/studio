@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 
 export default function DashboardLayout({
   children,
@@ -57,6 +57,10 @@ export default function DashboardLayout({
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-72 border-r-0">
+                <SheetHeader className="sr-only">
+                  <SheetTitle>Navigation Menu</SheetTitle>
+                  <SheetDescription>Access dashboard sections and candidate management.</SheetDescription>
+                </SheetHeader>
                 <div className="h-16 flex items-center px-6 border-b">
                   <Link href="/dashboard" className="flex items-center space-x-2.5" onClick={() => setIsMobileMenuOpen(false)}>
                     <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
