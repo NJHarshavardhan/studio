@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from "react";
@@ -12,7 +13,7 @@ import { useFirestore } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
+import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface ResumeAnalyzerProps {
@@ -28,7 +29,6 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
   const firestore = useFirestore();
   const router = useRouter();
 
-  // Handle countdown for quota error
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (quotaWait !== null && quotaWait > 0) {
@@ -43,7 +43,6 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Clear previous states
     setResult(null);
     setIsAnalyzing(true);
 
@@ -63,16 +62,9 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
             description: `${analysis.extractedInfo.name} matched with ${analysis.matchScore}%`,
           });
         } catch (error: any) {
-          console.error('Resume Analysis Error:', error);
-          
           if (error.message?.includes('429') || error.message?.includes('RESOURCE_EXHAUSTED')) {
-            const waitSeconds = 30; // Standard wait for Gemini free tier
+            const waitSeconds = 30;
             setQuotaWait(waitSeconds);
-            toast({
-              variant: "destructive",
-              title: "AI Rate Limit Reached",
-              description: `The AI is busy. Please wait ${waitSeconds} seconds before trying again.`,
-            });
           } else {
             toast({
               variant: "destructive",
@@ -84,7 +76,7 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
           setIsAnalyzing(false);
         }
       };
-      reader.readAsDataURL(file);
+      reader.readAsAsDataURL(file);
     } catch (error) {
       setIsAnalyzing(false);
       toast({
@@ -101,16 +93,15 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
 
     const candidateData = {
       name: result.extractedInfo.name,
-      email: result.extractedInfo.email,
-      phone: result.extractedInfo.phone,
-      yearsOfExperience: result.extractedInfo.yearsOfExperience,
-      matchScore: result.matchScore,
+      email: result.extractedInfo.email.toLowerCase().trim(),
+      phone: result.extractedInfo.phone || "Not provided",
+      yearsOfExperience: Number(result.extractedInfo.yearsOfExperience) || 0,
+      matchScore: Number(result.matchScore) || 0,
       currentStage: "Shortlisted",
-      jobId: "default-job-id",
-      resumeDataUri: result.resumeDataUri,
+      jobId: "default-job-id", // In a real app, this would be linked to a selected job
+      resumeDataUri: result.resumeDataUri || "",
       appliedDate: new Date().toISOString(),
       interviewStatus: "none",
-      createdAt: serverTimestamp()
     };
 
     const candidatesCol = collection(firestore, "candidates");
@@ -124,11 +115,12 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
         router.push("/dashboard/candidates");
       })
       .catch(async (serverError) => {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({
+        const permissionError = new FirestorePermissionError({
           path: candidatesCol.path,
           operation: 'create',
           requestResourceData: candidateData,
-        }));
+        } satisfies SecurityRuleContext);
+        errorEmitter.emit('permission-error', permissionError);
       })
       .finally(() => setIsApproving(false));
   };
@@ -146,24 +138,19 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
       )}
 
       <Card className="border-dashed border-2 bg-slate-50/50 hover:bg-slate-50 transition-colors">
-        <CardContent className="flex flex-col items-center justify-center p-12">
+        <CardContent className="flex flex-col items-center justify-center p-12 text-center">
           {isAnalyzing ? (
-            <div className="flex flex-col items-center gap-4 text-center">
-              <div className="relative">
-                <Loader2 className="h-12 w-12 text-primary animate-spin" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-[10px] font-bold text-primary">AI</span>
-                </div>
-              </div>
+            <div className="space-y-4">
+              <Loader2 className="h-12 w-12 text-primary animate-spin mx-auto" />
               <div>
                 <h3 className="text-lg font-semibold">Parsing Candidate Data...</h3>
-                <p className="text-sm text-slate-500 max-w-xs">Extracting skills, experience, and contact information via GenAI.</p>
+                <p className="text-sm text-slate-500 max-w-xs mx-auto">Extracting skills, experience, and contact information via GenAI.</p>
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center gap-4 text-center">
-              <div className="p-4 rounded-full bg-primary/10 text-primary group">
-                <FileUp className="h-8 w-8 group-hover:scale-110 transition-transform" />
+            <div className="space-y-4">
+              <div className="p-4 rounded-full bg-primary/10 text-primary w-fit mx-auto">
+                <FileUp className="h-8 w-8" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold">Screen New Candidate</h3>
@@ -194,7 +181,7 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
              <CardHeader className="bg-slate-50/50">
                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                  <div className="flex items-center gap-4">
-                   <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl shadow-inner">
+                   <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl">
                      {result.extractedInfo.name[0] || 'C'}
                    </div>
                    <div>
@@ -228,31 +215,18 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
                       </div>
                       <Progress value={result.matchScore} className="h-3" />
                     </div>
-
                     <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
                       <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">AI Candidate Profile</h4>
-                      <p className="text-sm text-slate-700 leading-relaxed italic">
-                        "{result.extractedInfo.candidateSummary}"
-                      </p>
-                    </div>
-
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Key Assets</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {result.extractedInfo.strengths.map((s, idx) => (
-                          <Badge key={`strength-${idx}`} variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-100 px-3 py-1">{s}</Badge>
-                        ))}
-                      </div>
+                      <p className="text-sm text-slate-700 leading-relaxed italic">"{result.extractedInfo.candidateSummary}"</p>
                     </div>
                   </div>
-
                   <div className="space-y-8">
                     <div>
                       <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Requirement Gaps</h4>
                       <div className="space-y-3">
                         {result.skillGapAnalysis.length > 0 ? (
                           result.skillGapAnalysis.map((gap, i) => (
-                            <div key={`gap-${i}`} className="flex items-start gap-3 p-4 rounded-xl bg-amber-50/50 border border-amber-100">
+                            <div key={`gap-${i}-${gap.skill}`} className="flex items-start gap-3 p-4 rounded-xl bg-amber-50/50 border border-amber-100">
                               <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
                               <div>
                                 <p className="text-sm font-bold text-slate-900">{gap.skill}</p>
@@ -268,12 +242,11 @@ export function ResumeAnalyzer({ jobDescription }: ResumeAnalyzerProps) {
                         )}
                       </div>
                     </div>
-
                     <div>
                       <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Technologies</h4>
                       <div className="flex flex-wrap gap-2">
                         {result.extractedInfo.technologies.map((t, idx) => (
-                          <Badge key={`tech-${idx}`} variant="outline" className="text-blue-600 border-blue-200 bg-blue-50/50 px-3 py-1 font-medium">{t}</Badge>
+                          <Badge key={`tech-${idx}-${t}`} variant="outline" className="text-blue-600 border-blue-200 bg-blue-50/50 px-3 py-1 font-medium">{t}</Badge>
                         ))}
                       </div>
                     </div>

@@ -12,7 +12,7 @@ import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, addDoc, doc, deleteDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
+import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 
@@ -36,8 +36,10 @@ export default function JobsPage() {
     setIsCreating(true);
 
     const jobData = {
-      ...newJob,
-      status: "Open",
+      title: newJob.title,
+      description: newJob.description,
+      location: newJob.location,
+      status: "Open" as const,
       createdAt: new Date().toISOString()
     };
 
@@ -48,11 +50,12 @@ export default function JobsPage() {
         toast({ title: "Job Created", description: "Your job opening is now active." });
       })
       .catch((e) => {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({
+        const permissionError = new FirestorePermissionError({
           path: jobsRef.path,
           operation: 'create',
           requestResourceData: jobData
-        }));
+        } satisfies SecurityRuleContext);
+        errorEmitter.emit('permission-error', permissionError);
       })
       .finally(() => setIsCreating(false));
   };
@@ -61,10 +64,11 @@ export default function JobsPage() {
     if (!firestore) return;
     const jobDoc = doc(firestore, "jobs", id);
     deleteDoc(jobDoc).catch((e) => {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({
+      const permissionError = new FirestorePermissionError({
         path: jobDoc.path,
         operation: 'delete'
-      }));
+      } satisfies SecurityRuleContext);
+      errorEmitter.emit('permission-error', permissionError);
     });
   };
 
