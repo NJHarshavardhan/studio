@@ -1,10 +1,11 @@
+
 "use client"
 
 import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bot, CheckCircle2, Clock, ArrowRight, Briefcase, Search, Loader2, LogOut } from "lucide-react";
+import { Bot, CheckCircle2, Clock, ArrowRight, Briefcase, Search, Loader2, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { useFirestore, useCollection } from "@/firebase";
@@ -30,32 +31,32 @@ export default function CandidatePortal() {
     return applications?.[0];
   }, [applications]);
 
-  // Handle local loading vs firestore loading
   const showLoading = (loading || !firestore) && isLoggedIn;
 
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <Card className="max-w-md w-full border-none shadow-2xl">
-          <CardHeader className="text-center">
-            <div className="mx-auto bg-primary w-14 h-14 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg shadow-primary/20">
-              <Bot className="h-8 w-8" />
+        <Card className="max-w-md w-full border-none shadow-2xl rounded-3xl overflow-hidden">
+          <CardHeader className="text-center pt-10 px-8">
+            <div className="mx-auto bg-primary w-16 h-16 rounded-2xl flex items-center justify-center text-white mb-6 shadow-xl shadow-primary/20">
+              <Bot className="h-10 w-10" />
             </div>
-            <CardTitle className="text-2xl font-bold">Candidate Portal</CardTitle>
-            <CardDescription>Enter the email you used for your application</CardDescription>
+            <CardTitle className="text-3xl font-black">Candidate Portal</CardTitle>
+            <CardDescription className="text-slate-500 mt-2 text-base">Enter the email you used for your application</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6 px-8 pb-12 pt-6">
             <div className="space-y-2">
               <Input 
-                placeholder="email@example.com" 
+                placeholder="name@company.com" 
                 type="email"
+                className="h-12 rounded-xl text-base px-4 bg-slate-50 border-slate-100"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && email && setIsLoggedIn(true)}
               />
             </div>
-            <Button className="w-full h-11" onClick={() => setIsLoggedIn(true)} disabled={!email}>
-              Check Application Status <ArrowRight className="ml-2 h-4 w-4" />
+            <Button className="w-full h-12 text-base font-bold rounded-xl shadow-lg shadow-primary/20" onClick={() => setIsLoggedIn(true)} disabled={!email}>
+              Check Application Status <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </CardContent>
         </Card>
@@ -65,34 +66,44 @@ export default function CandidatePortal() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FC]">
-      <header className="h-16 bg-white border-b px-8 flex items-center justify-between sticky top-0 z-50">
-        <Link href="/" className="flex items-center space-x-2">
-          <div className="bg-primary p-1.5 rounded-lg text-white">
-            <Bot className="h-5 w-5" />
+      <header className="h-16 bg-white border-b flex items-center justify-between sticky top-0 z-50 px-4 md:px-8">
+        <Link href="/" className="flex items-center space-x-2.5">
+          <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
+            <Bot className="h-5 w-5 text-white" />
           </div>
-          <span className="font-bold text-lg tracking-tight">HireStack</span>
+          <span className="font-black text-xl tracking-tight hidden sm:block">HireStack</span>
         </Link>
         <div className="flex items-center gap-4">
-          <div className="text-right hidden sm:block">
-            {showLoading ? <Skeleton className="h-4 w-24" /> : <p className="text-sm font-semibold">{activeApplication?.name || "Candidate"}</p>}
-            <p className="text-[10px] text-slate-500">{cleanEmail}</p>
+          <div className="text-right hidden sm:block mr-2">
+            {showLoading ? (
+              <div className="space-y-1">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+            ) : (
+              <>
+                <p className="text-sm font-bold text-slate-900 leading-none mb-1">{activeApplication?.name || "Candidate"}</p>
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{cleanEmail}</p>
+              </>
+            )}
           </div>
-          <Button variant="ghost" size="sm" onClick={() => { setIsLoggedIn(false); setEmail(""); }}>
-            <LogOut className="h-4 w-4 mr-2" /> Sign Out
+          <div className="h-8 w-px bg-slate-100 hidden sm:block" />
+          <Button variant="ghost" size="sm" className="rounded-xl h-10 px-4 text-slate-600 font-bold hover:bg-slate-50" onClick={() => { setIsLoggedIn(false); setEmail(""); }}>
+            <LogOut className="h-4 w-4 mr-2" /> <span className="hidden xs:inline">Sign Out</span>
           </Button>
         </div>
       </header>
 
       <main className="max-w-4xl mx-auto py-12 px-6">
-        <div className="space-y-8">
+        <div className="space-y-10">
           <div>
-            <h2 className="text-3xl font-extrabold text-slate-900">Your Journey</h2>
-            <p className="text-slate-500 mt-1">Track your progress in our automated recruitment pipeline.</p>
+            <h2 className="text-4xl font-black text-slate-900 tracking-tight">Your Journey</h2>
+            <p className="text-slate-500 mt-2 text-lg">Track your progress in our automated recruitment pipeline.</p>
           </div>
 
           {showLoading ? (
              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-               <Card className="md:col-span-2 border-none shadow-sm p-8 space-y-8 bg-white">
+               <Card className="md:col-span-2 border-none shadow-sm p-8 space-y-8 bg-white rounded-3xl">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-4">
                       <Skeleton className="h-12 w-12 rounded-2xl" />
@@ -104,7 +115,7 @@ export default function CandidatePortal() {
                     <Skeleton className="h-8 w-24 rounded-full" />
                   </div>
                   <div className="space-y-10 relative">
-                    <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-slate-100" />
+                    <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-slate-50" />
                     {[1, 2, 3, 4].map(i => (
                       <div key={i} className="flex gap-6 items-start">
                         <Skeleton className="h-8 w-8 rounded-full z-10" />
@@ -116,32 +127,32 @@ export default function CandidatePortal() {
                     ))}
                   </div>
                </Card>
-               <Skeleton className="h-[300px] rounded-2xl" />
+               <Skeleton className="h-[400px] rounded-3xl" />
              </div>
           ) : activeApplication ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Card className="md:col-span-2 border-none shadow-sm overflow-hidden">
-                <CardHeader className="bg-white border-b pb-6">
-                  <div className="flex items-center justify-between">
+              <Card className="md:col-span-2 border-none shadow-sm overflow-hidden rounded-3xl bg-white">
+                <CardHeader className="border-b pb-8 p-8">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-2xl bg-blue-50 text-blue-600">
-                        <Briefcase className="h-6 w-6" />
+                      <div className="p-4 rounded-2xl bg-primary/10 text-primary">
+                        <Briefcase className="h-8 w-8" />
                       </div>
                       <div>
-                        <CardTitle className="text-xl">Application Update</CardTitle>
-                        <CardDescription>Status for: {activeApplication.email}</CardDescription>
+                        <CardTitle className="text-2xl font-black">Application Update</CardTitle>
+                        <CardDescription className="font-bold text-slate-400">Status for: {activeApplication.email}</CardDescription>
                       </div>
                     </div>
-                    <Badge className="bg-blue-50 text-blue-700 border-none px-4 py-1.5 rounded-full">
+                    <Badge className="bg-primary/10 text-primary border-none px-6 py-2 rounded-full font-black text-xs uppercase tracking-widest self-start sm:self-auto">
                       {activeApplication.currentStage}
                     </Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="p-8">
-                  <div className="space-y-8">
+                  <div className="space-y-10">
                     <div className="relative">
                       <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-slate-100" />
-                      <div className="space-y-8 relative">
+                      <div className="space-y-10 relative">
                         {[
                           { stage: "Applied", desc: "Resume submitted and received.", done: true },
                           { stage: "AI Screening", desc: "Our AI matched your profile with role requirements.", done: true },
@@ -149,41 +160,44 @@ export default function CandidatePortal() {
                           { stage: "HR Review", desc: "Final decision by our human recruitment team.", done: activeApplication.currentStage === "Selected" || activeApplication.currentStage === "Rejected" },
                         ].map((s, idx) => (
                           <div key={idx} className="flex gap-6 items-start">
-                            <div className={`h-8 w-8 rounded-full flex items-center justify-center z-10 ${s.done ? "bg-emerald-500 text-white shadow-lg shadow-emerald-200" : "bg-white border-2 border-slate-200 text-slate-300"}`}>
+                            <div className={`h-8 w-8 rounded-full flex items-center justify-center z-10 shrink-0 ${s.done ? "bg-emerald-500 text-white shadow-lg shadow-emerald-200" : "bg-white border-2 border-slate-100 text-slate-300"}`}>
                               {s.done ? <CheckCircle2 className="h-5 w-5" /> : <Clock className="h-4 w-4" />}
                             </div>
                             <div>
-                              <p className={`font-bold ${s.done ? "text-slate-900" : "text-slate-400"}`}>{s.stage}</p>
-                              <p className="text-sm text-slate-500">{s.desc}</p>
+                              <p className={`font-black text-lg ${s.done ? "text-slate-900" : "text-slate-400"}`}>{s.stage}</p>
+                              <p className="text-slate-500 font-medium">{s.desc}</p>
                             </div>
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    <div className="pt-8 border-t">
+                    <div className="pt-8 border-t border-slate-50">
                       {activeApplication.currentStage === "AI Interview" && activeApplication.interviewStatus !== "completed" ? (
-                        <div className="bg-indigo-50 rounded-2xl p-6 border border-indigo-100">
-                          <h4 className="font-bold text-indigo-900 mb-2">Ready to Interview?</h4>
-                          <p className="text-sm text-indigo-700 mb-6">Your profile has been shortlisted. You can start your AI-driven technical screening now.</p>
+                        <div className="bg-primary/5 rounded-3xl p-8 border border-primary/10">
+                          <h4 className="font-black text-xl text-primary mb-2">Ready to Interview?</h4>
+                          <p className="text-slate-600 mb-8 font-medium">Your profile has been shortlisted. You can start your AI-driven technical screening now. It takes approximately 10-15 minutes.</p>
                           <Link href={`/interview/${activeApplication.id}`}>
-                            <Button className="bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-200">
-                              Start AI Interview Session <ArrowRight className="ml-2 h-4 w-4" />
+                            <Button className="w-full sm:w-auto px-8 h-12 text-base font-bold rounded-xl bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20">
+                              Start AI Interview Session <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
                           </Link>
                         </div>
                       ) : activeApplication.interviewStatus === "completed" ? (
-                        <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-100 flex items-center gap-4">
-                          <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                            <CheckCircle2 className="h-6 w-6" />
+                        <div className="bg-emerald-50 rounded-3xl p-8 border border-emerald-100 flex flex-col sm:flex-row items-center gap-6">
+                          <div className="h-16 w-16 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+                            <CheckCircle2 className="h-10 w-10" />
                           </div>
-                          <div>
-                            <h4 className="font-bold text-emerald-900">Interview Completed</h4>
-                            <p className="text-sm text-emerald-700">Thank you! Our HR team is currently reviewing your session transcript.</p>
+                          <div className="text-center sm:text-left">
+                            <h4 className="font-black text-xl text-emerald-900">Interview Completed</h4>
+                            <p className="text-emerald-700 font-medium">Thank you! Our HR team is currently reviewing your session transcript and results.</p>
                           </div>
                         </div>
                       ) : (
-                        <p className="text-sm text-slate-500 italic">Your application is currently being processed by our screening engine.</p>
+                        <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100 text-slate-500">
+                          <Search className="h-4 w-4" />
+                          <p className="text-sm font-bold">Your application is currently being processed by our screening engine.</p>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -191,12 +205,12 @@ export default function CandidatePortal() {
               </Card>
 
               <div className="space-y-6">
-                <Card className="border-none shadow-sm bg-primary text-white overflow-hidden">
-                  <div className="p-6">
-                    <CardTitle className="text-lg flex items-center gap-2 mb-4">
-                      <Bot className="h-5 w-5" /> AI Assistant Tips
+                <Card className="border-none shadow-xl bg-primary text-white overflow-hidden rounded-3xl">
+                  <div className="p-8">
+                    <CardTitle className="text-xl font-black flex items-center gap-2 mb-6">
+                      <Bot className="h-6 w-6" /> AI Assistant Tips
                     </CardTitle>
-                    <div className="space-y-4">
+                    <div className="space-y-5">
                       {[
                         "Ensure you have a quiet environment for the interview.",
                         "Be prepared to discuss your current and expected salary.",
@@ -204,23 +218,33 @@ export default function CandidatePortal() {
                         "Session usually takes 10-15 minutes."
                       ].map((tip, i) => (
                         <div key={i} className="flex gap-3 items-start">
-                          <div className="h-1.5 w-1.5 rounded-full bg-blue-300 mt-1.5 flex-shrink-0" />
-                          <p className="text-xs opacity-90">{tip}</p>
+                          <div className="h-2 w-2 rounded-full bg-white/40 mt-1.5 flex-shrink-0" />
+                          <p className="text-sm font-medium opacity-90 leading-relaxed">{tip}</p>
                         </div>
                       ))}
                     </div>
                   </div>
                 </Card>
+                
+                <Card className="border-none shadow-sm bg-white p-8 rounded-3xl">
+                   <h4 className="font-black text-slate-900 mb-4">Need Help?</h4>
+                   <p className="text-sm text-slate-500 font-medium mb-6">If you encounter any issues during your session, contact our support team.</p>
+                   <Button variant="outline" className="w-full rounded-xl border-slate-200 font-bold h-11">
+                     Contact Support
+                   </Button>
+                </Card>
               </div>
             </div>
           ) : (
-            <Card className="border-dashed border-2 bg-white p-20 text-center rounded-3xl">
-              <Search className="h-12 w-12 text-slate-200 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-slate-900">No Application Found</h3>
-              <p className="text-slate-500 max-w-sm mx-auto mt-2">
+            <Card className="border-dashed border-2 bg-white/50 p-20 text-center rounded-3xl border-slate-200">
+              <div className="h-20 w-20 bg-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <Search className="h-10 w-10 text-slate-300" />
+              </div>
+              <h3 className="text-2xl font-black text-slate-900">No Application Found</h3>
+              <p className="text-slate-500 max-w-sm mx-auto mt-2 font-medium">
                 We couldn't find any active applications for <strong>{cleanEmail}</strong>. Please ensure you entered the correct email.
               </p>
-              <Button variant="outline" className="mt-8" onClick={() => { setIsLoggedIn(false); setEmail(""); }}>
+              <Button variant="outline" className="mt-8 rounded-xl h-11 px-8 border-slate-200 font-bold" onClick={() => { setIsLoggedIn(false); setEmail(""); }}>
                 Try Another Email
               </Button>
             </Card>
