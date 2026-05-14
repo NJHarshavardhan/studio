@@ -14,9 +14,8 @@ import {
   AreaChart,
   Area
 } from 'recharts';
-import { useFirestore, useCollection } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy, limit } from "firebase/firestore";
-import { useMemoFirebase } from "@/firebase";
 import { cn } from "@/lib/utils";
 
 const data = [
@@ -32,11 +31,16 @@ const data = [
 export default function Dashboard() {
   const firestore = useFirestore();
   
-  const { data: candidates } = useCollection(collection(firestore, "candidates"));
-  const { data: jobs } = useCollection(collection(firestore, "jobs"));
-  const { data: interviews } = useCollection(collection(firestore, "interviews"));
+  const candidatesRef = useMemoFirebase(() => firestore ? collection(firestore, "candidates") : null, [firestore]);
+  const jobsRef = useMemoFirebase(() => firestore ? collection(firestore, "jobs") : null, [firestore]);
+  const interviewsRef = useMemoFirebase(() => firestore ? collection(firestore, "interviews") : null, [firestore]);
+
+  const { data: candidates } = useCollection(candidatesRef);
+  const { data: jobs } = useCollection(jobsRef);
+  const { data: interviews } = useCollection(interviewsRef);
 
   const recentReportsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
     return query(collection(firestore, "candidates"), orderBy("appliedDate", "desc"), limit(5));
   }, [firestore]);
   
@@ -140,7 +144,7 @@ export default function Dashboard() {
                 <div key={report.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500">
-                      {report.name[0]}
+                      {report.name ? report.name[0] : 'C'}
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-slate-900">{report.name}</p>
@@ -155,7 +159,7 @@ export default function Dashboard() {
                       {report.matchScore}% Match
                     </div>
                     <div className="text-[10px] text-slate-400 flex items-center justify-end gap-1">
-                      <Clock className="h-2 w-2" /> {new Date(report.appliedDate).toLocaleDateString()}
+                      <Clock className="h-2 w-2" /> {report.appliedDate ? new Date(report.appliedDate).toLocaleDateString() : 'Pending'}
                     </div>
                   </div>
                 </div>

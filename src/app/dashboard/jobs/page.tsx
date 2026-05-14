@@ -8,8 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Briefcase, MapPin, Clock, Loader2, Trash2 } from "lucide-react";
-import { useFirestore, useCollection } from "@/firebase";
-import { collection, addDoc, serverTimestamp, deleteDoc, doc } from "firebase/firestore";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { collection, addDoc, doc, deleteDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -22,7 +22,7 @@ export default function JobsPage() {
   const firestore = useFirestore();
   const { toast } = useToast();
   
-  const jobsRef = collection(firestore, "jobs");
+  const jobsRef = useMemoFirebase(() => firestore ? collection(firestore, "jobs") : null, [firestore]);
   const { data: jobs, loading } = useCollection(jobsRef);
 
   const [newJob, setNewJob] = useState({
@@ -32,7 +32,7 @@ export default function JobsPage() {
   });
 
   const handleCreateJob = () => {
-    if (!newJob.title || !newJob.description) return;
+    if (!newJob.title || !newJob.description || !jobsRef) return;
     setIsCreating(true);
 
     const jobData = {
@@ -58,6 +58,7 @@ export default function JobsPage() {
   };
 
   const handleDeleteJob = (id: string) => {
+    if (!firestore) return;
     const jobDoc = doc(firestore, "jobs", id);
     deleteDoc(jobDoc).catch((e) => {
       errorEmitter.emit('permission-error', new FirestorePermissionError({
@@ -128,7 +129,7 @@ export default function JobsPage() {
               <CardTitle className="text-xl mt-4">{job.title}</CardTitle>
               <div className="flex items-center gap-4 text-xs text-slate-500">
                 <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {job.location}</span>
-                <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {new Date(job.createdAt).toLocaleDateString()}</span>
+                <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'N/A'}</span>
               </div>
             </CardHeader>
             <CardContent>
