@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useMemo } from "react";
@@ -17,7 +16,8 @@ import {
   Loader2,
   Copy,
   Check,
-  Briefcase
+  Briefcase,
+  ExternalLink
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
@@ -112,16 +112,15 @@ export default function CandidatesPipeline() {
         setNewCandidate({ name: "", email: "", jobId: "" });
         toast({
           title: "Candidate Added",
-          description: "New candidate has been successfully added to the pipeline.",
+          description: "Candidate successfully manually entered into the pipeline.",
         });
       })
       .catch((e) => {
-        const permissionError = new FirestorePermissionError({
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
           path: "candidates",
           operation: 'create',
           requestResourceData: candidateData,
-        } satisfies SecurityRuleContext);
-        errorEmitter.emit('permission-error', permissionError);
+        }));
       })
       .finally(() => setIsCreating(false));
   };
@@ -139,45 +138,30 @@ export default function CandidatesPipeline() {
         jobTitle: jobs?.find(j => j.id === candidate.jobId)?.title || 'Software Engineer'
       });
 
-      const emailsCol = collection(firestore, "emails");
-      addDoc(emailsCol, {
+      addDoc(collection(firestore, "emails"), {
         candidateEmail: candidate.email,
         candidateName: candidate.name,
         subject: emailResult.subject,
         body: emailResult.body,
         type: 'interview_invite',
         sentAt: new Date().toISOString()
-      }).catch(async (e) => {
-         errorEmitter.emit('permission-error', new FirestorePermissionError({
-           path: emailsCol.path,
-           operation: 'create'
-         }));
-      });
+      }).catch(e => console.error(e));
 
       const cRef = doc(firestore, "candidates", candidate.id);
-      const updateData = {
+      updateDoc(cRef, {
         interviewStatus: "sent",
         currentStage: "AI Interview"
-      };
-
-      updateDoc(cRef, updateData)
-        .catch(async (serverError) => {
-          errorEmitter.emit('permission-error', new FirestorePermissionError({
-            path: cRef.path,
-            operation: 'update',
-            requestResourceData: updateData,
-          }));
-        });
+      }).catch(e => console.error(e));
       
       toast({
-        title: "AI Interview Requested",
-        description: "Candidate status updated. You can now copy the link below.",
+        title: "Session Initialized",
+        description: "Invite generated. Copy the interview link for the candidate.",
       });
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Process Failed",
-        description: "Could not generate recruitment email context.",
+        description: "Could not generate session context.",
       });
     } finally {
       setIsSendingMail(null);
@@ -186,60 +170,67 @@ export default function CandidatesPipeline() {
 
   if (loadingCandidates) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex items-center justify-center h-[50vh]">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-8 pb-12">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Candidates Pipeline</h1>
-          <p className="text-slate-500">Manage your recruitment workflow stages.</p>
+          <h1 className="text-4xl font-black tracking-tight text-foreground">Pipeline</h1>
+          <p className="text-muted-foreground mt-1 text-lg">Visual workflow management for active talent.</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4 mr-2" /> Filter
-          </Button>
-          
+        <div className="flex items-center gap-3">
+          <div className="relative hidden md:block w-64">
+             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+             <Input 
+               placeholder="Search talent..." 
+               className="pl-10 h-10 rounded-xl bg-card border-none focus-visible:ring-1" 
+               value={searchTerm}
+               onChange={(e) => setSearchTerm(e.target.value)}
+             />
+          </div>
           <Dialog open={isManualAddOpen} onOpenChange={setIsManualAddOpen}>
             <DialogTrigger asChild>
-              <Button size="sm">
+              <Button className="rounded-xl shadow-lg shadow-primary/20 bg-primary">
                 <UserPlus className="h-4 w-4 mr-2" /> Add Candidate
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="rounded-3xl max-w-md">
               <DialogHeader>
-                <DialogTitle>Manual Candidate Entry</DialogTitle>
-                <DialogDescription>Add a candidate directly to the pipeline without AI screening.</DialogDescription>
+                <DialogTitle className="text-2xl font-black">Quick Entry</DialogTitle>
+                <DialogDescription>Add a candidate directly to the initial pipeline stage.</DialogDescription>
               </DialogHeader>
-              <div className="space-y-4 py-4">
+              <div className="space-y-5 py-6">
                 <div className="space-y-2">
-                  <Label>Full Name</Label>
+                  <Label className="text-sm font-bold">Full Name</Label>
                   <Input 
                     placeholder="e.g. John Doe" 
+                    className="h-12 rounded-xl"
                     value={newCandidate.name} 
                     onChange={(e) => setNewCandidate({...newCandidate, name: e.target.value})}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Email Address</Label>
+                  <Label className="text-sm font-bold">Email Address</Label>
                   <Input 
                     type="email" 
                     placeholder="john@example.com" 
+                    className="h-12 rounded-xl"
                     value={newCandidate.email}
                     onChange={(e) => setNewCandidate({...newCandidate, email: e.target.value})}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Target Job</Label>
+                  <Label className="text-sm font-bold">Target Job</Label>
                   <Select onValueChange={(val) => setNewCandidate({...newCandidate, jobId: val})}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a job position" />
+                    <SelectTrigger className="h-12 rounded-xl">
+                      <SelectValue placeholder="Select position" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="rounded-2xl">
                       {jobs?.map(job => (
                         <SelectItem key={job.id} value={job.id}>{job.title}</SelectItem>
                       ))}
@@ -248,9 +239,9 @@ export default function CandidatesPipeline() {
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsManualAddOpen(false)}>Cancel</Button>
-                <Button onClick={handleManualAdd} disabled={isCreating || !newCandidate.name || !newCandidate.email || !newCandidate.jobId}>
-                  {isCreating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : "Add Candidate"}
+                <Button variant="outline" className="rounded-xl h-11" onClick={() => setIsManualAddOpen(false)}>Cancel</Button>
+                <Button className="rounded-xl h-11 px-8" onClick={handleManualAdd} disabled={isCreating || !newCandidate.name || !newCandidate.email || !newCandidate.jobId}>
+                  {isCreating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : "Save Candidate"}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -258,98 +249,97 @@ export default function CandidatesPipeline() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 max-w-sm">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input 
-            placeholder="Search candidates..." 
-            className="pl-10" 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+      <div className="flex gap-6 overflow-x-auto pb-8 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
         {STAGES.map((stage) => (
-          <div key={stage} className="flex-shrink-0 w-80">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-slate-900">{stage}</h3>
-                <Badge variant="secondary" className="rounded-full px-2 py-0">
+          <div key={stage} className="flex-shrink-0 w-80 md:w-85">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-3">
+                <h3 className="font-black text-foreground text-sm uppercase tracking-widest">{stage}</h3>
+                <span className="bg-primary/10 text-primary text-[10px] font-black px-2 py-0.5 rounded-full">
                   {filteredCandidates.filter(c => c.currentStage === stage).length}
-                </Badge>
+                </span>
               </div>
             </div>
             
-            <div className="space-y-3 min-h-[500px] bg-slate-50 rounded-xl p-3 border border-dashed border-slate-200">
+            <div className="space-y-4 min-h-[600px] bg-muted/30 rounded-[32px] p-4 border-2 border-dashed border-muted">
               {filteredCandidates
                 .filter(c => c.currentStage === stage)
                 .map((candidate) => (
-                  <Card key={candidate.id} className="group cursor-pointer hover:border-primary transition-colors shadow-sm bg-white">
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
+                  <Card key={candidate.id} className="group cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all shadow-sm bg-card border-none rounded-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <CardContent className="p-5">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-sm font-black text-primary border border-primary/10">
                           {candidate.name ? candidate.name.split(' ').map((n: string) => n[0]).join('') : 'C'}
                         </div>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100">
-                          <MoreVertical className="h-3 w-3" />
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                          <MoreVertical className="h-4 w-4" />
                         </Button>
                       </div>
-                      <h4 className="text-sm font-semibold text-slate-900 truncate">{candidate.name}</h4>
-                      <p className="text-[10px] text-slate-500 truncate mb-1">{candidate.email}</p>
                       
-                      <div className="flex items-center gap-1 mb-3">
-                        <Briefcase className="h-3 w-3 text-slate-400" />
-                        <span className="text-[10px] text-slate-500 font-medium truncate">
-                          {jobs?.find(j => j.id === candidate.jobId)?.title || "General Application"}
+                      <div className="space-y-1">
+                        <h4 className="text-sm font-black text-foreground truncate">{candidate.name}</h4>
+                        <p className="text-[11px] text-muted-foreground font-medium truncate">{candidate.email}</p>
+                      </div>
+                      
+                      <div className="flex items-center gap-1.5 mt-3 mb-4">
+                        <div className="p-1 bg-muted rounded-md">
+                          <Briefcase className="h-3 w-3 text-muted-foreground" />
+                        </div>
+                        <span className="text-[10px] text-muted-foreground font-bold truncate">
+                          {jobs?.find(j => j.id === candidate.jobId)?.title || "Unknown Position"}
                         </span>
                       </div>
                       
                       {stage === "Shortlisted" && (
                          <Button 
                            variant="outline" 
-                           size="sm" 
-                           className="w-full mt-2 h-7 text-[10px] bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border-indigo-200"
+                           className="w-full h-9 text-[10px] font-black uppercase tracking-wider bg-primary/5 text-primary border-primary/20 hover:bg-primary hover:text-white transition-all rounded-xl"
                            disabled={isSendingMail === candidate.id}
                            onClick={(e) => {
                              e.stopPropagation();
                              handleSendInterviewRequest(candidate);
                            }}
                          >
-                           {isSendingMail === candidate.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3 mr-1" />}
-                           {isSendingMail === candidate.id ? "Processing..." : "Move to AI Interview"}
+                           {isSendingMail === candidate.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3 mr-2" />}
+                           Initialize AI Session
                          </Button>
                       )}
 
                       {stage === "AI Interview" && (
-                        <div className="space-y-2 mt-2">
+                        <div className="space-y-3 pt-2">
                           <Button 
                             variant="outline" 
-                            size="sm" 
-                            className="w-full h-7 text-[10px] bg-emerald-50 text-emerald-700 border-emerald-100"
+                            className="w-full h-9 text-[10px] font-black uppercase tracking-wider bg-emerald-500/5 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all rounded-xl"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleCopyLink(candidate.id);
                             }}
                           >
-                            {copiedId === candidate.id ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
-                            {copiedId === candidate.id ? "Copied!" : "Copy Interview Link"}
+                            {copiedId === candidate.id ? <Check className="h-3 w-3 mr-2" /> : <Copy className="h-3 w-3 mr-2" />}
+                            {copiedId === candidate.id ? "Link Copied" : "Copy Session Link"}
                           </Button>
-                          <div className="flex items-center gap-1.5 text-[10px] text-amber-600 font-medium italic">
-                            <Video className="h-3 w-3" /> Waiting for response...
+                          <div className="flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-amber-500/10 text-amber-600">
+                            <span className="relative flex h-2 w-2">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                            </span>
+                            <span className="text-[9px] font-black uppercase tracking-widest">Waiting for Response</span>
                           </div>
                         </div>
                       )}
 
-                      <div className="mt-4 pt-4 border-t flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                          <span className="text-[10px] font-bold text-emerald-600">{candidate.matchScore || 0}% Match</span>
+                      <div className="mt-5 pt-4 border-t flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="h-5 w-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                            <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                          </div>
+                          <span className="text-[11px] font-black text-emerald-600">{candidate.matchScore || 0}% Match</span>
                         </div>
                         <div className="flex items-center gap-2">
-                           <FileText className="h-3 w-3 text-slate-400" />
-                           {candidate.interviewStatus === "completed" && <Video className="h-3 w-3 text-primary" />}
+                           <FileText className="h-3.5 w-3.5 text-muted-foreground hover:text-primary transition-colors" title="View Resume" />
+                           {candidate.interviewStatus === "completed" && (
+                             <Video className="h-3.5 w-3.5 text-primary" title="Interview Completed" />
+                           )}
                         </div>
                       </div>
                     </CardContent>
