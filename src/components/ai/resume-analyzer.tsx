@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react";
@@ -138,45 +137,48 @@ export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: Res
   return (
     <div className="space-y-6">
       {quotaWait !== null && (
-        <Alert variant="destructive" className="bg-amber-50 border-amber-200 text-amber-800">
-          <RefreshCw className="h-4 w-4 animate-spin text-amber-600" />
-          <AlertTitle>AI Quota Cooling Down</AlertTitle>
-          <AlertDescription className="text-sm">
+        <Alert variant="destructive" className="bg-amber-500/10 border-amber-500/20 text-amber-600 rounded-3xl">
+          <RefreshCw className="h-5 w-5 animate-spin text-amber-500" />
+          <AlertTitle className="font-black font-headline">AI Quota Cooling Down</AlertTitle>
+          <AlertDescription className="text-sm font-medium">
             Gemini Free Tier has a limit. Please wait <strong>{quotaWait}s</strong> before analyzing another file.
           </AlertDescription>
         </Alert>
       )}
 
-      <Card className="border-dashed border-2 bg-slate-50/50 hover:bg-slate-50 transition-colors">
-        <CardContent className="flex flex-col items-center justify-center p-12 text-center">
+      <Card className="border-dashed border-2 bg-card/50 hover:bg-card border-border transition-all rounded-[3rem] overflow-hidden group">
+        <CardContent className="flex flex-col items-center justify-center p-16 text-center cursor-pointer relative">
+          <input
+            type="file"
+            id="resume-upload"
+            className="absolute inset-0 opacity-0 cursor-pointer z-10"
+            accept=".pdf,.docx,.doc,.txt"
+            onChange={handleFileUpload}
+            disabled={quotaWait !== null || isAnalyzing}
+          />
           {isAnalyzing ? (
-            <div className="space-y-4">
-              <Loader2 className="h-12 w-12 text-primary animate-spin mx-auto" />
-              <div>
-                <h3 className="text-lg font-semibold">Parsing Candidate Data...</h3>
-                <p className="text-sm text-slate-500 max-w-xs mx-auto">Extracting skills, experience, and contact information via GenAI.</p>
+            <div className="space-y-6">
+              <div className="relative h-16 w-16 mx-auto">
+                <div className="absolute inset-0 rounded-full border-4 border-primary/20 animate-ping" />
+                <div className="relative bg-primary/10 rounded-full p-4">
+                  <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-2xl font-black font-headline text-foreground">Parsing Candidate Data...</h3>
+                <p className="text-sm text-muted-foreground max-w-xs mx-auto font-medium">Extracting skills, experience, and contact information via GenAI.</p>
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
-              <div className="p-4 rounded-full bg-primary/10 text-primary w-fit mx-auto">
-                <FileUp className="h-8 w-8" />
+            <div className="space-y-6">
+              <div className="p-6 rounded-[2rem] bg-primary/10 text-primary w-fit mx-auto group-hover:scale-110 transition-transform duration-300">
+                <FileUp className="h-10 w-10" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold">Screen New Candidate</h3>
-                <p className="text-sm text-slate-500 mb-6">Drop a resume here to start the AI screening process.</p>
-                <input
-                  type="file"
-                  id="resume-upload"
-                  className="hidden"
-                  accept=".pdf,.docx,.doc,.txt"
-                  onChange={handleFileUpload}
-                  disabled={quotaWait !== null}
-                />
-                <Button asChild disabled={quotaWait !== null}>
-                  <label htmlFor="resume-upload" className="cursor-pointer">
-                    Upload Resume
-                  </label>
+                <h3 className="text-2xl font-black font-headline text-foreground">Screen New Candidate</h3>
+                <p className="text-sm text-muted-foreground mb-8 font-medium max-w-sm">Drop a resume here or click to start the AI screening process.</p>
+                <Button className="rounded-2xl h-12 px-10 font-black shadow-xl shadow-primary/20" disabled={quotaWait !== null}>
+                  Upload Resume
                 </Button>
               </div>
             </div>
@@ -186,77 +188,80 @@ export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: Res
 
       {result && (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <Card className="border-none shadow-xl bg-white overflow-hidden">
+          <Card className="border-none shadow-2xl bg-card overflow-hidden rounded-[3rem]">
              <div className="h-2 bg-primary" />
-             <CardHeader className="bg-slate-50/50">
-               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                 <div className="flex items-center gap-4">
-                   <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl">
+             <CardHeader className="bg-muted/30 p-10">
+               <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                 <div className="flex items-center gap-6">
+                   <div className="h-16 w-16 rounded-[1.5rem] bg-primary/10 flex items-center justify-center text-primary font-black text-3xl border border-primary/20 shadow-inner">
                      {result.extractedInfo.name ? result.extractedInfo.name[0] : 'C'}
                    </div>
                    <div>
-                     <CardTitle className="text-2xl">{result.extractedInfo.name || "Extracted Candidate"}</CardTitle>
-                     <div className="flex flex-wrap gap-x-6 gap-y-1 mt-1">
-                        <span className="text-sm text-slate-500 flex items-center gap-1.5">
-                          <Mail className="h-3.5 w-3.5" /> {result.extractedInfo.email}
+                     <CardTitle className="text-3xl font-black font-headline text-foreground">{result.extractedInfo.name || "Extracted Candidate"}</CardTitle>
+                     <div className="flex flex-wrap gap-x-8 gap-y-2 mt-2">
+                        <span className="text-sm text-muted-foreground font-bold flex items-center gap-2">
+                          <Mail className="h-4 w-4 text-primary/60" /> {result.extractedInfo.email}
                         </span>
-                        <span className="text-sm text-slate-500 flex items-center gap-1.5">
-                          <Calendar className="h-3.5 w-3.5" /> {result.extractedInfo.yearsOfExperience}y Exp
+                        <span className="text-sm text-muted-foreground font-bold flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-primary/60" /> {result.extractedInfo.yearsOfExperience}y Exp
                         </span>
                      </div>
                    </div>
                  </div>
-                 <div className="flex gap-2">
-                   <Button variant="ghost" onClick={() => setResult(null)} disabled={isApproving}>Discard</Button>
-                   <Button onClick={handleApprove} disabled={isApproving} className="shadow-lg shadow-primary/20">
+                 <div className="flex gap-4">
+                   <Button variant="ghost" onClick={() => setResult(null)} disabled={isApproving} className="rounded-xl h-12 px-6 font-bold">Discard</Button>
+                   <Button onClick={handleApprove} disabled={isApproving} className="rounded-xl h-12 px-8 font-black shadow-xl shadow-primary/20">
                      {isApproving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
                      Approve for Interview
                    </Button>
                  </div>
                </div>
              </CardHeader>
-             <CardContent className="p-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                  <div className="space-y-8">
+             <CardContent className="p-10">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                  <div className="space-y-12">
                     <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Job Match Score</h4>
-                        <span className="text-3xl font-black text-primary">{result.matchScore}%</span>
+                      <div className="flex items-center justify-between mb-4 px-1">
+                        <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Match Accuracy</h4>
+                        <span className="text-4xl font-black text-primary font-headline">{result.matchScore}%</span>
                       </div>
-                      <Progress value={result.matchScore} className="h-3" />
+                      <Progress value={result.matchScore} className="h-3 rounded-full bg-muted" />
                     </div>
-                    <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">AI Candidate Profile</h4>
-                      <p className="text-sm text-slate-700 leading-relaxed italic">"{result.extractedInfo.candidateSummary}"</p>
+                    <div className="p-8 bg-muted/20 rounded-[2rem] border border-border relative">
+                      <div className="absolute top-0 right-0 p-4 opacity-5">
+                         <FileUp className="h-12 w-12" />
+                      </div>
+                      <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6">AI Profile Insight</h4>
+                      <p className="text-base text-foreground font-medium leading-relaxed italic">"{result.extractedInfo.candidateSummary}"</p>
                     </div>
                   </div>
-                  <div className="space-y-8">
+                  <div className="space-y-12">
                     <div>
-                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Requirement Gaps</h4>
-                      <div className="space-y-3">
+                      <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-6">Qualification Gap Analysis</h4>
+                      <div className="space-y-4">
                         {result.skillGapAnalysis.length > 0 ? (
                           result.skillGapAnalysis.map((gap, i) => (
-                            <div key={`gap-${i}-${gap.skill}`} className="flex items-start gap-3 p-4 rounded-xl bg-amber-50/50 border border-amber-100">
-                              <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
+                            <div key={`gap-${i}-${gap.skill}`} className="flex items-start gap-5 p-5 rounded-2xl bg-amber-500/5 border border-amber-500/10">
+                              <AlertCircle className="h-5 w-5 text-amber-500 mt-1 shrink-0" />
                               <div>
-                                <p className="text-sm font-bold text-slate-900">{gap.skill}</p>
-                                <p className="text-xs text-slate-600 leading-tight mt-1">{gap.reason}</p>
+                                <p className="text-sm font-black text-foreground font-headline">{gap.skill}</p>
+                                <p className="text-xs text-muted-foreground font-medium leading-relaxed mt-1.5">{gap.reason}</p>
                               </div>
                             </div>
                           ))
                         ) : (
-                          <div className="flex flex-col items-center justify-center py-8 bg-emerald-50/50 rounded-xl border border-emerald-100">
-                            <CheckCircle2 className="h-8 w-8 text-emerald-500 mb-2" />
-                            <p className="text-sm text-emerald-700 font-bold">Perfect match for all requirements!</p>
+                          <div className="flex flex-col items-center justify-center py-10 bg-emerald-500/5 rounded-[2rem] border border-emerald-500/10">
+                            <CheckCircle2 className="h-10 w-10 text-emerald-500 mb-4" />
+                            <p className="text-sm text-emerald-600 font-black uppercase tracking-widest">Premium Match Criteria</p>
                           </div>
                         )}
                       </div>
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Technologies</h4>
-                      <div className="flex flex-wrap gap-2">
+                      <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-6">Tech Stack & Tools</h4>
+                      <div className="flex flex-wrap gap-3">
                         {result.extractedInfo.technologies.map((t, idx) => (
-                          <Badge key={`tech-${idx}-${t}`} variant="outline" className="text-blue-600 border-blue-200 bg-blue-50/50 px-3 py-1 font-medium">{t}</Badge>
+                          <Badge key={`tech-${idx}-${t}`} variant="secondary" className="text-[10px] font-black uppercase tracking-widest bg-primary/5 text-primary border-primary/10 px-4 py-1.5 rounded-full">{t}</Badge>
                         ))}
                       </div>
                     </div>
