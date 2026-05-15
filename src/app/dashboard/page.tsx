@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Users, Briefcase, Bot, CheckCircle2, TrendingUp, Clock, Loader2, Database, Sparkles, ArrowUpRight, ArrowDownRight, PieChart } from "lucide-react";
+import { Users, Briefcase, Bot, CheckCircle2, Database, Sparkles, ArrowUpRight, ArrowDownRight, PieChart, Clock, Loader2 } from "lucide-react";
 import { 
   BarChart, 
   Bar, 
@@ -110,20 +110,20 @@ export default function Dashboard() {
     <div className="space-y-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">Overview</h1>
-          <p className="text-muted-foreground mt-1 text-base md:text-lg">Recruitment intelligence & pipeline health.</p>
+          <h1 className="text-3xl md:text-5xl font-black tracking-tight text-foreground font-headline">Overview</h1>
+          <p className="text-muted-foreground mt-1 text-base md:text-lg font-medium">Recruitment intelligence & pipeline health.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
            <Button 
             variant="outline" 
             onClick={seedDemoData} 
             disabled={isSeeding}
-            className="rounded-xl border-dashed hover:bg-muted transition-colors h-11"
+            className="rounded-xl border-dashed hover:bg-muted transition-colors h-12 px-6"
           >
             {isSeeding ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Database className="h-4 w-4 mr-2" />}
             Initialize Demo Data
           </Button>
-          <Button className="rounded-xl shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90 h-11">
+          <Button className="rounded-xl shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90 h-12 px-6 font-bold">
              <Sparkles className="h-4 w-4 mr-2" /> AI Insights
           </Button>
         </div>
@@ -131,11 +131,11 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {stats.map((stat) => (
-          <Card key={stat.title} className="border-none shadow-sm hover:shadow-md transition-all duration-300 group rounded-2xl overflow-hidden bg-card">
-            <CardContent className="p-6">
+          <Card key={stat.title} className="border-none shadow-sm hover:shadow-md transition-all duration-300 group rounded-3xl overflow-hidden bg-card">
+            <CardContent className="p-7">
               <div className="flex items-center justify-between">
-                <div className={cn("p-2.5 rounded-xl transition-transform group-hover:scale-110", stat.bg)}>
-                  <stat.icon className={cn("h-5 w-5", stat.color)} />
+                <div className={cn("p-3 rounded-2xl transition-transform group-hover:scale-110", stat.bg)}>
+                  <stat.icon className={cn("h-6 w-6", stat.color)} />
                 </div>
                 {isLoading ? <Skeleton className="h-6 w-16 rounded-full" /> : (
                   <div className={cn(
@@ -147,10 +147,10 @@ export default function Dashboard() {
                   </div>
                 )}
               </div>
-              <div className="mt-5">
-                <h3 className="text-sm font-semibold text-muted-foreground tracking-tight">{stat.title}</h3>
-                {isLoading ? <Skeleton className="h-10 w-20 mt-1" /> : (
-                  <p className="text-3xl font-black text-foreground mt-1 tabular-nums">
+              <div className="mt-6">
+                <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest">{stat.title}</h3>
+                {isLoading ? <Skeleton className="h-10 w-20 mt-2" /> : (
+                  <p className="text-4xl font-black text-foreground mt-2 tabular-nums font-headline">
                     {stat.value}
                   </p>
                 )}
@@ -160,16 +160,16 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border-none shadow-sm rounded-2xl bg-card">
-          <CardHeader className="pb-0">
-            <CardTitle className="text-xl font-bold text-foreground">Activity Flow</CardTitle>
-            <CardDescription className="text-muted-foreground">Daily recruitment throughput across stages</CardDescription>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <Card className="border-none shadow-sm rounded-3xl bg-card overflow-hidden">
+          <CardHeader className="pb-0 pt-8 px-8">
+            <CardTitle className="text-xl font-black text-foreground font-headline">Activity Flow</CardTitle>
+            <CardDescription className="text-muted-foreground font-medium">Daily recruitment throughput across stages</CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px] mt-4">
+          <CardContent className="h-[320px] mt-6 px-4">
             {isLoading ? (
-              <div className="w-full h-full flex flex-col gap-4">
-                <Skeleton className="w-full flex-1" />
+              <div className="w-full h-full flex flex-col gap-4 p-4">
+                <Skeleton className="w-full flex-1 rounded-2xl" />
                 <div className="flex justify-between">
                    {[1,2,3,4,5,6,7].map(i => <Skeleton key={i} className="h-4 w-8" />)}
                 </div>
@@ -188,33 +188,33 @@ export default function Dashboard() {
                   <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
                   <Tooltip 
                     contentStyle={{ 
-                      borderRadius: '16px', 
+                      borderRadius: '20px', 
                       border: 'none', 
-                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                      boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
                       backgroundColor: 'hsl(var(--card))',
                       color: 'hsl(var(--card-foreground))'
                     }}
                   />
-                  <Area type="monotone" dataKey="applications" stroke="hsl(var(--primary))" strokeWidth={3} fillOpacity={1} fill="url(#colorFlow)" />
+                  <Area type="monotone" dataKey="applications" stroke="hsl(var(--primary))" strokeWidth={4} fillOpacity={1} fill="url(#colorFlow)" />
                 </AreaChart>
               </ResponsiveContainer>
             )}
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm rounded-2xl bg-card">
-          <CardHeader className="pb-0">
-            <CardTitle className="text-xl font-bold text-foreground">Session Volume</CardTitle>
-            <CardDescription className="text-muted-foreground">AI Interview completion trends</CardDescription>
+        <Card className="border-none shadow-sm rounded-3xl bg-card overflow-hidden">
+          <CardHeader className="pb-0 pt-8 px-8">
+            <CardTitle className="text-xl font-black text-foreground font-headline">Session Volume</CardTitle>
+            <CardDescription className="text-muted-foreground font-medium">AI Interview completion trends</CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px] mt-4">
+          <CardContent className="h-[320px] mt-6 px-4">
              {isLoading ? (
-              <div className="w-full h-full flex flex-col gap-4">
-                <div className="flex items-end justify-between flex-1 gap-2">
+              <div className="w-full h-full flex flex-col gap-4 p-4">
+                <div className="flex items-end justify-between flex-1 gap-3">
                    {Array.from({ length: 7 }).map((_, i) => (
                      <Skeleton 
                       key={i} 
-                      className="w-full" 
+                      className="w-full rounded-t-xl" 
                       style={{ height: skeletonHeights[i] ? `${skeletonHeights[i]}%` : '50%' }} 
                     />
                    ))}
@@ -231,13 +231,13 @@ export default function Dashboard() {
                   <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
                   <Tooltip 
                     contentStyle={{ 
-                      borderRadius: '16px', 
+                      borderRadius: '20px', 
                       border: 'none', 
-                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                      boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
                       backgroundColor: 'hsl(var(--card))'
                     }}
                   />
-                  <Bar dataKey="interviews" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} barSize={40} />
+                  <Bar dataKey="interviews" fill="hsl(var(--primary))" radius={[10, 10, 0, 0]} barSize={44} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -245,104 +245,105 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 border-none shadow-sm rounded-2xl bg-card overflow-hidden">
-          <CardHeader className="border-b bg-muted/20">
-            <CardTitle className="text-xl font-bold flex items-center gap-2 text-foreground">
-               <Sparkles className="h-5 w-5 text-amber-500" /> Recent Talent Matches
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <Card className="lg:col-span-2 border-none shadow-sm rounded-3xl bg-card overflow-hidden">
+          <CardHeader className="border-b bg-muted/20 p-8">
+            <CardTitle className="text-xl font-black flex items-center gap-3 text-foreground font-headline">
+               <Sparkles className="h-6 w-6 text-amber-500" /> Recent Talent Matches
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="divide-y divide-border">
               {loadingRecent ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="flex items-center justify-between p-6">
-                    <div className="flex items-center gap-4">
-                      <Skeleton className="h-12 w-12 rounded-2xl" />
-                      <div className="space-y-2">
-                        <Skeleton className="h-4 w-32" />
-                        <Skeleton className="h-3 w-20" />
+                  <div key={i} className="flex items-center justify-between p-8">
+                    <div className="flex items-center gap-5">
+                      <Skeleton className="h-14 w-14 rounded-2xl" />
+                      <div className="space-y-3">
+                        <Skeleton className="h-5 w-40" />
+                        <Skeleton className="h-4 w-24" />
                       </div>
                     </div>
-                    <div className="text-right space-y-2">
-                      <Skeleton className="h-6 w-12 ml-auto" />
-                      <Skeleton className="h-3 w-24 ml-auto" />
+                    <div className="text-right space-y-3">
+                      <Skeleton className="h-8 w-14 ml-auto" />
+                      <Skeleton className="h-4 w-28 ml-auto" />
                     </div>
                   </div>
                 ))
               ) : recentCandidates?.map((report: any) => (
-                <div key={report.id} className="flex items-center justify-between p-6 hover:bg-muted/30 transition-colors group cursor-pointer">
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-2xl bg-primary/5 flex items-center justify-center font-black text-primary text-xl border border-primary/10">
+                <div key={report.id} className="flex items-center justify-between p-8 hover:bg-muted/30 transition-colors group cursor-pointer">
+                  <div className="flex items-center gap-5">
+                    <div className="h-14 w-14 rounded-2xl bg-primary/5 flex items-center justify-center font-black text-primary text-2xl border border-primary/10 shadow-sm">
                       {report.name ? report.name[0] : 'C'}
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{report.name}</p>
-                      <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">{report.currentStage}</p>
+                      <p className="text-base font-bold text-foreground group-hover:text-primary transition-colors font-headline">{report.name}</p>
+                      <p className="text-[11px] text-muted-foreground font-black uppercase tracking-widest mt-0.5">{report.currentStage}</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <div className={cn(
-                      "text-lg font-black",
+                      "text-2xl font-black font-headline",
                       report.matchScore > 80 ? "text-emerald-500" : report.matchScore > 60 ? "text-amber-500" : "text-red-500"
                     )}>
                       {report.matchScore}%
                     </div>
-                    <div className="text-[10px] text-muted-foreground flex items-center justify-end gap-1.5 font-medium">
-                      <Clock className="h-3 w-3" /> {report.appliedDate ? new Date(report.appliedDate).toLocaleDateString() : 'N/A'}
+                    <div className="text-[10px] text-muted-foreground flex items-center justify-end gap-1.5 font-bold uppercase tracking-wider mt-1">
+                      <Clock className="h-3.5 w-3.5" /> {report.appliedDate ? new Date(report.appliedDate).toLocaleDateString() : 'N/A'}
                     </div>
                   </div>
                 </div>
               ))}
               {!loadingRecent && recentCandidates?.length === 0 && (
-                <div className="text-center py-20">
-                  <Users className="h-12 w-12 text-muted/30 mx-auto mb-4" />
-                  <p className="text-muted-foreground italic text-sm">No recent matches found.</p>
+                <div className="text-center py-24">
+                  <Users className="h-16 w-16 text-muted/20 mx-auto mb-6" />
+                  <p className="text-muted-foreground italic text-lg font-medium">No recent matches found.</p>
                 </div>
               )}
             </div>
           </CardContent>
         </Card>
 
-        <div className="space-y-6">
-          <Card className="border-none shadow-sm rounded-2xl bg-card p-6">
-            <CardTitle className="text-lg font-bold mb-5 text-foreground">Pipeline Actions</CardTitle>
-            <div className="space-y-3">
+        <div className="space-y-8">
+          <Card className="border-none shadow-sm rounded-3xl bg-card p-8">
+            <CardTitle className="text-xl font-black mb-8 text-foreground font-headline">Pipeline Actions</CardTitle>
+            <div className="space-y-4">
                <Button 
                 variant="outline" 
-                className="w-full justify-start h-12 rounded-xl group hover:border-primary/50 transition-all px-4" 
+                className="w-full justify-start h-14 rounded-2xl group hover:border-primary/50 transition-all px-5 border-2" 
                 onClick={() => window.location.href='/dashboard/jobs'}
               >
-                 <Briefcase className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
-                 <span className="font-bold text-foreground truncate">Create New Position</span>
+                 <Briefcase className="h-5 w-5 mr-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
+                 <span className="font-bold text-foreground truncate text-base">Create New Position</span>
                </Button>
                <Button 
                 variant="outline" 
-                className="w-full justify-start h-12 rounded-xl group hover:border-primary/50 transition-all px-4" 
+                className="w-full justify-start h-14 rounded-2xl group hover:border-primary/50 transition-all px-5 border-2" 
                 onClick={() => window.location.href='/dashboard/screening'}
               >
-                 <Bot className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
-                 <span className="font-bold text-foreground truncate">Start AI Screening</span>
+                 <Bot className="h-5 w-5 mr-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
+                 <span className="font-bold text-foreground truncate text-base">Start AI Screening</span>
                </Button>
                <Button 
                 variant="outline" 
-                className="w-full justify-start h-12 rounded-xl group hover:border-primary/50 transition-all px-4" 
+                className="w-full justify-start h-14 rounded-2xl group hover:border-primary/50 transition-all px-5 border-2" 
                 onClick={() => window.location.href='/dashboard/analytics'}
               >
-                 <PieChart className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
-                 <span className="font-bold text-foreground truncate">Detailed Metrics</span>
+                 <PieChart className="h-5 w-5 mr-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
+                 <span className="font-bold text-foreground truncate text-base">Detailed Metrics</span>
                </Button>
             </div>
           </Card>
 
-          <Card className="border-none shadow-lg shadow-primary/5 rounded-2xl bg-primary p-6 text-primary-foreground">
-             <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-white/20 rounded-lg">
-                   <Sparkles className="h-5 w-5" />
+          <Card className="border-none shadow-2xl shadow-primary/10 rounded-3xl bg-primary p-8 text-primary-foreground relative overflow-hidden">
+             <div className="absolute -top-10 -right-10 h-40 w-40 bg-white/10 rounded-full blur-3xl" />
+             <div className="flex items-center gap-4 mb-6 relative">
+                <div className="p-3 bg-white/20 rounded-2xl shadow-inner">
+                   <Sparkles className="h-6 w-6" />
                 </div>
-                <h3 className="font-bold">AI Pro Tip</h3>
+                <h3 className="font-black text-xl font-headline">AI Pro Tip</h3>
              </div>
-             <p className="text-sm opacity-90 leading-relaxed font-medium">
+             <p className="text-sm opacity-90 leading-relaxed font-medium relative">
                Candidates with a match score above 85% have a 3x higher retention rate. Use the "AI Screening" tool to quickly identify top-tier talent from bulk uploads.
              </p>
           </Card>
