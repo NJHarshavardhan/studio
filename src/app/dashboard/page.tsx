@@ -39,7 +39,6 @@ export default function Dashboard() {
   const { toast } = useToast();
   
   useEffect(() => {
-    // Generate random heights once on mount to avoid hydration mismatch
     setSkeletonHeights(Array.from({ length: 7 }, () => Math.floor(Math.random() * 60) + 20));
   }, []);
 
@@ -59,10 +58,10 @@ export default function Dashboard() {
   const { data: recentCandidates, loading: loadingRecent } = useCollection(recentReportsQuery);
 
   const stats = [
-    { title: "Total Candidates", value: candidates?.length || 0, icon: Users, trend: "+12.5%", isUp: true, color: "text-blue-600", bg: "bg-blue-500/10" },
-    { title: "Active Jobs", value: jobs?.length || 0, icon: Briefcase, trend: "+3 new", isUp: true, color: "text-indigo-600", bg: "bg-indigo-500/10" },
-    { title: "AI Interviews", value: interviews?.length || 0, icon: Bot, trend: "+24 today", isUp: true, color: "text-purple-600", bg: "bg-purple-500/10" },
-    { title: "Hired", value: candidates?.filter((c: any) => c.currentStage === "Selected").length || 0, icon: CheckCircle2, trend: "+2 this week", isUp: true, color: "text-emerald-600", bg: "bg-emerald-500/10" },
+    { title: "Total Candidates", value: candidates?.length || 0, icon: Users, trend: "+12.5%", isUp: true, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-500/10" },
+    { title: "Active Jobs", value: jobs?.length || 0, icon: Briefcase, trend: "+3 new", isUp: true, color: "text-indigo-600 dark:text-indigo-400", bg: "bg-indigo-500/10" },
+    { title: "AI Interviews", value: interviews?.length || 0, icon: Bot, trend: "+24 today", isUp: true, color: "text-purple-600 dark:text-purple-400", bg: "bg-purple-500/10" },
+    { title: "Hired", value: candidates?.filter((c: any) => c.currentStage === "Selected").length || 0, icon: CheckCircle2, trend: "+2 this week", isUp: true, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10" },
   ];
 
   const seedDemoData = async () => {
@@ -109,7 +108,6 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
-      {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">Overview</h1>
@@ -131,7 +129,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {stats.map((stat) => (
           <Card key={stat.title} className="border-none shadow-sm hover:shadow-md transition-all duration-300 group rounded-2xl overflow-hidden bg-card">
@@ -143,7 +140,7 @@ export default function Dashboard() {
                 {isLoading ? <Skeleton className="h-6 w-16 rounded-full" /> : (
                   <div className={cn(
                     "flex items-center gap-0.5 text-xs font-bold px-2 py-1 rounded-full",
-                    stat.isUp ? "bg-emerald-500/10 text-emerald-600" : "bg-red-500/10 text-red-600"
+                    stat.isUp ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-red-500/10 text-red-600 dark:text-red-400"
                   )}>
                     {stat.isUp ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
                     {stat.trend}
@@ -163,12 +160,11 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="border-none shadow-sm rounded-2xl bg-card">
           <CardHeader className="pb-0">
-            <CardTitle className="text-xl font-bold">Activity Flow</CardTitle>
-            <CardDescription>Daily recruitment throughput across stages</CardDescription>
+            <CardTitle className="text-xl font-bold text-foreground">Activity Flow</CardTitle>
+            <CardDescription className="text-muted-foreground">Daily recruitment throughput across stages</CardDescription>
           </CardHeader>
           <CardContent className="h-[300px] mt-4">
             {isLoading ? (
@@ -208,8 +204,8 @@ export default function Dashboard() {
 
         <Card className="border-none shadow-sm rounded-2xl bg-card">
           <CardHeader className="pb-0">
-            <CardTitle className="text-xl font-bold">Session Volume</CardTitle>
-            <CardDescription>AI Interview completion trends</CardDescription>
+            <CardTitle className="text-xl font-bold text-foreground">Session Volume</CardTitle>
+            <CardDescription className="text-muted-foreground">AI Interview completion trends</CardDescription>
           </CardHeader>
           <CardContent className="h-[300px] mt-4">
              {isLoading ? (
@@ -249,17 +245,15 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Main Grid: Talent Matches + Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Talent Matches Feed */}
         <Card className="lg:col-span-2 border-none shadow-sm rounded-2xl bg-card overflow-hidden">
           <CardHeader className="border-b bg-muted/20">
-            <CardTitle className="text-xl font-bold flex items-center gap-2">
+            <CardTitle className="text-xl font-bold flex items-center gap-2 text-foreground">
                <Sparkles className="h-5 w-5 text-amber-500" /> Recent Talent Matches
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="divide-y">
+            <div className="divide-y divide-border">
               {loadingRecent ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <div key={i} className="flex items-center justify-between p-6">
@@ -310,10 +304,9 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Sidebar Actions & Pro Tip */}
         <div className="space-y-6">
           <Card className="border-none shadow-sm rounded-2xl bg-card p-6">
-            <CardTitle className="text-lg font-bold mb-5">Pipeline Actions</CardTitle>
+            <CardTitle className="text-lg font-bold mb-5 text-foreground">Pipeline Actions</CardTitle>
             <div className="space-y-3">
                <Button 
                 variant="outline" 
@@ -321,7 +314,7 @@ export default function Dashboard() {
                 onClick={() => window.location.href='/dashboard/jobs'}
               >
                  <Briefcase className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
-                 <span className="font-bold text-slate-700 truncate">Create New Position</span>
+                 <span className="font-bold text-foreground truncate">Create New Position</span>
                </Button>
                <Button 
                 variant="outline" 
@@ -329,7 +322,7 @@ export default function Dashboard() {
                 onClick={() => window.location.href='/dashboard/screening'}
               >
                  <Bot className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
-                 <span className="font-bold text-slate-700 truncate">Start AI Screening</span>
+                 <span className="font-bold text-foreground truncate">Start AI Screening</span>
                </Button>
                <Button 
                 variant="outline" 
@@ -337,7 +330,7 @@ export default function Dashboard() {
                 onClick={() => window.location.href='/dashboard/analytics'}
               >
                  <PieChart className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
-                 <span className="font-bold text-slate-700 truncate">Detailed Metrics</span>
+                 <span className="font-bold text-foreground truncate">Detailed Metrics</span>
                </Button>
             </div>
           </Card>

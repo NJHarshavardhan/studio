@@ -38,15 +38,15 @@ Key Requirements:
     <div className="space-y-8 max-w-5xl mx-auto">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">AI Resume Screening</h1>
-          <p className="text-slate-500">Analyze candidate resumes against specific job descriptions.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">AI Resume Screening</h1>
+          <p className="text-muted-foreground">Analyze candidate resumes against specific job descriptions.</p>
         </div>
       </div>
 
-      <Alert className="bg-blue-50 border-blue-200">
-        <Info className="h-4 w-4 text-blue-600" />
-        <AlertTitle className="text-blue-800">AI Quota Tip</AlertTitle>
-        <AlertDescription className="text-blue-700 text-xs">
+      <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-900">
+        <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+        <AlertTitle className="text-blue-800 dark:text-blue-200">AI Quota Tip</AlertTitle>
+        <AlertDescription className="text-blue-700 dark:text-blue-300 text-xs">
           The Gemini Free Tier allows for approximately 10-15 resume analyses per minute. If you hit a rate limit, simply wait 30 seconds before uploading the next file.
         </AlertDescription>
       </Alert>
@@ -54,16 +54,16 @@ Key Requirements:
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-1 space-y-6">
           <div className="space-y-2">
-            <Label className="text-slate-900 font-semibold flex items-center gap-2">
+            <Label className="text-foreground font-semibold flex items-center gap-2">
               <Briefcase className="h-4 w-4" /> Select Target Job
             </Label>
             {loadingJobs ? (
-              <div className="flex items-center gap-2 text-sm text-slate-500">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="h-3 w-3 animate-spin" /> Loading jobs...
               </div>
             ) : (
               <Select onValueChange={handleJobChange} value={selectedJobId}>
-                <SelectTrigger className="bg-white">
+                <SelectTrigger className="bg-card">
                   <SelectValue placeholder="Choose a position..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -76,15 +76,15 @@ Key Requirements:
                 </SelectContent>
               </Select>
             )}
-            <p className="text-[10px] text-slate-400">Selecting a job will automatically load its description.</p>
+            <p className="text-[10px] text-muted-foreground">Selecting a job will automatically load its description.</p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="jd" className="text-slate-900 font-semibold">Job Description</Label>
+            <Label htmlFor="jd" className="text-foreground font-semibold">Job Description</Label>
             <Textarea 
               id="jd" 
               placeholder="Paste your job description here..." 
-              className="min-h-[300px] bg-white text-sm leading-relaxed"
+              className="min-h-[300px] bg-card text-sm leading-relaxed"
               value={jd}
               onChange={(e) => setJd(e.target.value)}
             />
