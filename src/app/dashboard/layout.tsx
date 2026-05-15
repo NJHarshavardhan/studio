@@ -1,7 +1,7 @@
 "use client"
 
 import { SidebarNav } from "@/components/dashboard/sidebar-nav";
-import { Bot, Bell, Search, User, Menu, X, Sparkles } from "lucide-react";
+import { Heart, Bell, Search, User, Menu, X, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,96 +17,96 @@ export default function DashboardLayout({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#FDF4FF] dark:bg-background">
+    <div className="flex min-h-screen bg-background dark:bg-background">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-64 flex-col fixed inset-y-0 z-50 border-r bg-white/80 dark:bg-card/80 backdrop-blur-xl">
-        <div className="h-20 flex items-center px-6 border-b shrink-0">
+      <aside className="hidden lg:flex w-72 flex-col fixed inset-y-0 z-50 border-r bg-card/50 backdrop-blur-3xl">
+        <div className="h-24 flex items-center px-8 border-b shrink-0">
           <Link href="/dashboard" className="flex items-center space-x-3">
-            <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
-              <Bot className="h-6 w-6 text-primary-foreground" />
+            <div className="bg-primary p-2.5 rounded-2xl shadow-2xl shadow-primary/20">
+              <Heart className="h-6 w-6 text-primary-foreground fill-current" />
             </div>
-            <span className="font-extrabold text-xl tracking-tight font-headline">HireStack</span>
+            <span className="font-black text-2xl tracking-tighter font-headline text-foreground">HireStack</span>
           </Link>
         </div>
-        <div className="flex-1 overflow-y-auto py-8">
+        <div className="flex-1 overflow-y-auto py-10">
           <SidebarNav />
         </div>
-        <div className="p-4 border-t">
-          <div className="flex items-center gap-3 p-3 rounded-2xl bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-colors cursor-pointer group">
-            <div className="h-10 w-10 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform">
+        <div className="p-6 border-t">
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-all cursor-pointer group">
+            <div className="h-12 w-12 rounded-xl bg-primary text-white flex items-center justify-center font-black text-sm shadow-xl shadow-primary/20 group-hover:scale-105 transition-transform">
               JD
             </div>
             <div className="flex flex-col min-w-0">
-              <span className="text-sm font-bold truncate leading-none mb-1 text-foreground">Jane Doe</span>
-              <span className="text-[10px] text-primary truncate uppercase font-black tracking-wider">HR Manager</span>
+              <span className="text-sm font-black truncate leading-none mb-1 text-foreground">Jane Doe</span>
+              <span className="text-[10px] text-primary truncate uppercase font-black tracking-[0.2em]">HR Director</span>
             </div>
           </div>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col lg:pl-64">
-        <header className="h-20 border-b bg-white/70 dark:bg-background/70 backdrop-blur-xl flex items-center justify-between px-4 md:px-8 lg:px-10 sticky top-0 z-40 shrink-0">
-          <div className="flex items-center gap-4 flex-1">
+      <div className="flex-1 flex flex-col lg:pl-72">
+        <header className="h-24 border-b bg-background/70 backdrop-blur-3xl flex items-center justify-between px-6 md:px-10 lg:px-12 sticky top-0 z-40 shrink-0">
+          <div className="flex items-center gap-6 flex-1">
             {/* Mobile Menu Trigger */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden rounded-xl h-11 w-11 bg-slate-50 dark:bg-muted/40 border border-slate-100 dark:border-none flex items-center justify-center">
+                <Button variant="ghost" size="icon" className="lg:hidden rounded-2xl h-12 w-12 bg-card border border-border shadow-sm">
                   <Menu className="h-6 w-6 text-foreground" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="p-0 w-72 border-r-0 rounded-r-[40px] overflow-hidden">
+              <SheetContent side="left" className="p-0 w-80 border-r-0 rounded-r-[3rem] overflow-hidden glass-morphism">
                 <SheetHeader className="sr-only">
                   <SheetTitle>Navigation Menu</SheetTitle>
-                  <SheetDescription>Access dashboard sections and candidate management.</SheetDescription>
+                  <SheetDescription>Access recruitment pipeline and automated tools.</SheetDescription>
                 </SheetHeader>
-                <div className="h-20 flex items-center px-8 border-b">
+                <div className="h-24 flex items-center px-10 border-b">
                   <Link href="/dashboard" className="flex items-center space-x-3" onClick={() => setIsMobileMenuOpen(false)}>
-                    <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
-                      <Bot className="h-6 w-6 text-primary-foreground" />
+                    <div className="bg-primary p-2.5 rounded-2xl shadow-xl shadow-primary/20">
+                      <Heart className="h-6 w-6 text-primary-foreground fill-current" />
                     </div>
-                    <span className="font-extrabold text-2xl tracking-tight font-headline text-foreground">HireStack</span>
+                    <span className="font-black text-2xl tracking-tighter font-headline text-foreground">HireStack</span>
                   </Link>
                 </div>
-                <div className="py-10">
+                <div className="py-12">
                   <SidebarNav onItemClick={() => setIsMobileMenuOpen(false)} />
                 </div>
               </SheetContent>
             </Sheet>
 
-            <div className="hidden md:flex items-center gap-4 flex-1 max-w-lg">
-              <div className="relative w-full">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+            <div className="hidden md:flex items-center gap-4 flex-1 max-w-xl">
+              <div className="relative w-full group">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <Input 
-                  placeholder="Search talent, jobs, reports..." 
-                  className="pl-12 h-12 bg-slate-50 dark:bg-muted/40 border-slate-100 dark:border-none focus-visible:ring-primary rounded-2xl w-full text-base font-medium" 
+                  placeholder="Search candidates, jobs, reports..." 
+                  className="pl-14 h-14 bg-card/50 border-border focus-visible:ring-primary rounded-[1.5rem] w-full text-base font-bold shadow-sm" 
                 />
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-5">
-            <div className="hidden sm:flex items-center gap-2 mr-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/50">
-              <Sparkles className="h-3.5 w-3.5" />
-              <span className="text-[10px] font-black uppercase tracking-widest">AI Core Online</span>
+          <div className="flex items-center gap-3 md:gap-6">
+            <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 text-primary border border-primary/20">
+              <Sparkles className="h-4 w-4" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">AI Core v4.0</span>
             </div>
             <ThemeToggle />
             <Link href="/dashboard/notifications">
-              <Button variant="ghost" size="icon" className="relative rounded-2xl w-11 h-11 bg-slate-50 dark:bg-muted/40 border border-slate-100 dark:border-none">
-                <Bell className="h-5 w-5 text-slate-500" />
-                <span className="absolute top-3 right-3 h-2.5 w-2.5 bg-primary rounded-full border-2 border-white dark:border-background"></span>
+              <Button variant="ghost" size="icon" className="relative rounded-2xl w-12 h-12 bg-card border border-border shadow-sm">
+                <Bell className="h-6 w-6 text-muted-foreground" />
+                <span className="absolute top-3.5 right-3.5 h-2.5 w-2.5 bg-primary rounded-full border-2 border-background"></span>
               </Button>
             </Link>
-            <div className="h-10 w-px bg-slate-100 dark:bg-border mx-1 hidden sm:block" />
+            <div className="h-10 w-px bg-border mx-2 hidden sm:block" />
             <Link href="/dashboard/profile">
-              <div className="h-11 w-11 rounded-2xl bg-slate-100 dark:bg-muted flex items-center justify-center border-2 border-transparent hover:border-primary/30 cursor-pointer transition-all overflow-hidden shadow-sm">
-                <User className="h-5 w-5 text-slate-500" />
+              <div className="h-12 w-12 rounded-2xl bg-card flex items-center justify-center border-2 border-transparent hover:border-primary/40 cursor-pointer transition-all overflow-hidden shadow-sm group">
+                <User className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-colors" />
               </div>
             </Link>
           </div>
         </header>
 
-        <main className="flex-1 p-4 md:p-8 lg:p-12 max-w-[1600px] mx-auto w-full">
+        <main className="flex-1 p-6 md:p-10 lg:p-14 max-w-[1800px] mx-auto w-full">
           {children}
         </main>
       </div>
