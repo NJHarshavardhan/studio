@@ -1,9 +1,8 @@
 "use client"
 
 import { SidebarNav } from "@/components/dashboard/sidebar-nav";
-import { Heart, Bell, Search, User, Menu, X, Sparkles } from "lucide-react";
+import { Heart, Bell, User, Menu, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -47,7 +46,7 @@ export default function DashboardLayout({
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col lg:pl-72">
         <header className="h-24 border-b bg-background/70 backdrop-blur-3xl flex items-center justify-between px-6 md:px-10 lg:px-12 sticky top-0 z-40 shrink-0">
-          <div className="flex items-center gap-6 flex-1">
+          <div className="flex items-center gap-6">
             {/* Mobile Menu Trigger */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
@@ -74,22 +73,13 @@ export default function DashboardLayout({
               </SheetContent>
             </Sheet>
 
-            <div className="hidden md:flex items-center gap-4 flex-1 max-w-xl">
-              <div className="relative w-full group">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                <Input 
-                  placeholder="Search candidates, jobs, reports..." 
-                  className="pl-14 h-14 bg-card/50 border-border focus-visible:ring-primary rounded-[1.5rem] w-full text-base font-bold shadow-sm" 
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 md:gap-6">
             <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 text-primary border border-primary/20">
               <Sparkles className="h-4 w-4" />
               <span className="text-[10px] font-black uppercase tracking-[0.2em]">AI Core v4.0</span>
             </div>
+          </div>
+
+          <div className="flex items-center gap-3 md:gap-6">
             <ThemeToggle />
             <Link href="/dashboard/notifications">
               <Button variant="ghost" size="icon" className="relative rounded-2xl w-12 h-12 bg-card border border-border shadow-sm">
