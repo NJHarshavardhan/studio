@@ -96,7 +96,7 @@ export default function Home() {
                   <div className="p-4 w-16 h-16 rounded-3xl bg-[#FFF5F8] flex items-center justify-center text-primary shadow-inner">
                     <feature.icon className="h-8 w-8" />
                   </div>
-                  <h3 className="text-2xl font-bold text-slate-900">{feature.title}</h3>
+                  <h3 className="text-2xl font-bold font-headline text-slate-900">{feature.title}</h3>
                   <p className="text-slate-500 leading-relaxed font-medium">{feature.desc}</p>
                 </div>
               ))}

@@ -37,7 +37,7 @@ export default function DashboardLayout({
               JD
             </div>
             <div className="flex flex-col min-w-0">
-              <span className="text-sm font-bold truncate leading-none mb-1">Jane Doe</span>
+              <span className="text-sm font-bold truncate leading-none mb-1 text-foreground">Jane Doe</span>
               <span className="text-[10px] text-primary truncate uppercase font-black tracking-wider">HR Manager</span>
             </div>
           </div>
@@ -51,8 +51,8 @@ export default function DashboardLayout({
             {/* Mobile Menu Trigger */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden rounded-xl h-11 w-11 bg-slate-50 border border-slate-100 flex items-center justify-center">
-                  <Menu className="h-6 w-6" />
+                <Button variant="ghost" size="icon" className="lg:hidden rounded-xl h-11 w-11 bg-slate-50 dark:bg-muted/40 border border-slate-100 dark:border-none flex items-center justify-center">
+                  <Menu className="h-6 w-6 text-foreground" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-72 border-r-0 rounded-r-[40px] overflow-hidden">
@@ -65,7 +65,7 @@ export default function DashboardLayout({
                     <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
                       <Bot className="h-6 w-6 text-primary-foreground" />
                     </div>
-                    <span className="font-extrabold text-2xl tracking-tight font-headline">HireStack</span>
+                    <span className="font-extrabold text-2xl tracking-tight font-headline text-foreground">HireStack</span>
                   </Link>
                 </div>
                 <div className="py-10">
@@ -86,7 +86,7 @@ export default function DashboardLayout({
           </div>
 
           <div className="flex items-center gap-2 md:gap-5">
-            <div className="hidden sm:flex items-center gap-2 mr-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+            <div className="hidden sm:flex items-center gap-2 mr-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/50">
               <Sparkles className="h-3.5 w-3.5" />
               <span className="text-[10px] font-black uppercase tracking-widest">AI Core Online</span>
             </div>
