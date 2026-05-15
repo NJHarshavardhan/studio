@@ -23,7 +23,7 @@
     --border: 330 20% 91%;
     --input: 330 20% 91%;
     --ring: 330 81% 60%;
-    --radius: 0.75rem;
+    --radius: 1rem;
     --chart-1: 330 81% 60%;
     --chart-2: 340 70% 50%;
     --chart-3: 320 60% 40%;
@@ -60,6 +60,9 @@
   }
   body {
     @apply bg-background text-foreground font-body antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-headline;
   }
 }
 
