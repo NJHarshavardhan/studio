@@ -173,8 +173,8 @@ export default function CandidatesPipeline() {
     <div className="space-y-8 pb-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl font-black tracking-tight text-foreground">Pipeline</h1>
-          <p className="text-muted-foreground mt-1 text-lg">Visual workflow management for active talent.</p>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">Pipeline</h1>
+          <p className="text-muted-foreground mt-1 text-base md:text-lg">Visual workflow management for active talent.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative hidden md:block w-64">
@@ -188,7 +188,7 @@ export default function CandidatesPipeline() {
           </div>
           <Dialog open={isManualAddOpen} onOpenChange={setIsManualAddOpen}>
             <DialogTrigger asChild>
-              <Button className="rounded-xl shadow-lg shadow-primary/20 bg-primary">
+              <Button className="rounded-xl shadow-lg shadow-primary/20 bg-primary h-11 px-6">
                 <UserPlus className="h-4 w-4 mr-2" /> Add Candidate
               </Button>
             </DialogTrigger>
@@ -245,16 +245,16 @@ export default function CandidatesPipeline() {
       <div className="flex gap-6 overflow-x-auto pb-8 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
         {STAGES.map((stage) => (
           <div key={stage} className="flex-shrink-0 w-80 md:w-85">
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between mb-5 px-1">
               <div className="flex items-center gap-3">
-                <h3 className="font-black text-foreground text-sm uppercase tracking-widest">{stage}</h3>
+                <h3 className="font-black text-foreground text-xs uppercase tracking-widest">{stage}</h3>
                 <span className="bg-primary/10 text-primary text-[10px] font-black px-2 py-0.5 rounded-full">
                   {loadingCandidates ? "..." : filteredCandidates.filter(c => c.currentStage === stage).length}
                 </span>
               </div>
             </div>
             
-            <div className="space-y-4 min-h-[600px] bg-muted/30 rounded-[32px] p-4 border-2 border-dashed border-muted">
+            <div className="space-y-4 min-h-[500px] bg-muted/30 rounded-[32px] p-4 border-2 border-dashed border-muted/50">
               {loadingCandidates ? (
                 Array.from({ length: 3 }).map((_, i) => (
                   <Card key={i} className="shadow-sm border-none rounded-2xl overflow-hidden p-5 space-y-4 bg-card">

@@ -46,12 +46,12 @@ export default function DashboardLayout({
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col lg:pl-64">
-        <header className="h-20 border-b bg-white/70 dark:bg-background/70 backdrop-blur-xl flex items-center justify-between px-6 md:px-8 lg:px-10 sticky top-0 z-40 shrink-0">
-          <div className="flex items-center gap-6 flex-1">
+        <header className="h-20 border-b bg-white/70 dark:bg-background/70 backdrop-blur-xl flex items-center justify-between px-4 md:px-8 lg:px-10 sticky top-0 z-40 shrink-0">
+          <div className="flex items-center gap-4 flex-1">
             {/* Mobile Menu Trigger */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden rounded-xl h-11 w-11 bg-slate-50 border border-slate-100">
+                <Button variant="ghost" size="icon" className="lg:hidden rounded-xl h-11 w-11 bg-slate-50 border border-slate-100 flex items-center justify-center">
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
@@ -106,7 +106,7 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        <main className="flex-1 p-6 md:p-8 lg:p-12 max-w-[1600px] mx-auto w-full">
+        <main className="flex-1 p-4 md:p-8 lg:p-12 max-w-[1600px] mx-auto w-full">
           {children}
         </main>
       </div>

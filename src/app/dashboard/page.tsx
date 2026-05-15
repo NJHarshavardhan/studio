@@ -38,7 +38,6 @@ export default function Dashboard() {
   const { toast } = useToast();
   
   useEffect(() => {
-    // Generate random heights once on mount to avoid hydration mismatch
     setSkeletonHeights(Array.from({ length: 7 }, () => Math.floor(Math.random() * 60) + 20));
   }, []);
 
@@ -110,26 +109,26 @@ export default function Dashboard() {
     <div className="space-y-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl font-black tracking-tight text-foreground">Overview</h1>
-          <p className="text-muted-foreground mt-1 text-lg">Recruitment intelligence & pipeline health.</p>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">Overview</h1>
+          <p className="text-muted-foreground mt-1 text-base md:text-lg">Recruitment intelligence & pipeline health.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
            <Button 
             variant="outline" 
             onClick={seedDemoData} 
             disabled={isSeeding}
-            className="rounded-xl border-dashed hover:bg-muted transition-colors"
+            className="rounded-xl border-dashed hover:bg-muted transition-colors h-11"
           >
             {isSeeding ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Database className="h-4 w-4 mr-2" />}
             Initialize Demo Data
           </Button>
-          <Button className="rounded-xl shadow-lg shadow-primary/20 bg-primary hover:primary/90">
+          <Button className="rounded-xl shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90 h-11">
              <Sparkles className="h-4 w-4 mr-2" /> AI Insights
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {stats.map((stat) => (
           <Card key={stat.title} className="border-none shadow-sm hover:shadow-md transition-all duration-300 group rounded-2xl overflow-hidden bg-card">
             <CardContent className="p-6">
@@ -306,16 +305,19 @@ export default function Dashboard() {
 
         <div className="space-y-6">
           <Card className="border-none shadow-sm rounded-2xl bg-card p-6">
-            <CardTitle className="text-lg font-bold mb-4">Pipeline Actions</CardTitle>
+            <CardTitle className="text-lg font-bold mb-5">Pipeline Actions</CardTitle>
             <div className="space-y-3">
-               <Button variant="outline" className="w-full justify-start h-12 rounded-xl group" onClick={() => window.location.href='/dashboard/jobs'}>
-                 <Briefcase className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary" /> Create New Position
+               <Button variant="outline" className="w-full justify-start h-12 rounded-xl group hover:border-primary/50 transition-all" onClick={() => window.location.href='/dashboard/jobs'}>
+                 <Briefcase className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary transition-colors" /> 
+                 <span className="font-bold text-slate-700">Create New Position</span>
                </Button>
-               <Button variant="outline" className="w-full justify-start h-12 rounded-xl group" onClick={() => window.location.href='/dashboard/screening'}>
-                 <Bot className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary" /> Start AI Screening
+               <Button variant="outline" className="w-full justify-start h-12 rounded-xl group hover:border-primary/50 transition-all" onClick={() => window.location.href='/dashboard/screening'}>
+                 <Bot className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary transition-colors" /> 
+                 <span className="font-bold text-slate-700">Start AI Screening</span>
                </Button>
-               <Button variant="outline" className="w-full justify-start h-12 rounded-xl group" onClick={() => window.location.href='/dashboard/analytics'}>
-                 <PieChart className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary" /> View Detailed Metrics
+               <Button variant="outline" className="w-full justify-start h-12 rounded-xl group hover:border-primary/50 transition-all" onClick={() => window.location.href='/dashboard/analytics'}>
+                 <PieChart className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary transition-colors" /> 
+                 <span className="font-bold text-slate-700">Detailed Metrics</span>
                </Button>
             </div>
           </Card>
@@ -327,8 +329,8 @@ export default function Dashboard() {
                 </div>
                 <h3 className="font-bold">AI Pro Tip</h3>
              </div>
-             <p className="text-sm opacity-90 leading-relaxed">
-               Candidates with a match score above 85% have a 3x higher retention rate. Automate their invites in Settings.
+             <p className="text-sm opacity-90 leading-relaxed font-medium">
+               Candidates with a match score above 85% have a 3x higher retention rate. Use the "AI Screening" tool to quickly identify top-tier talent from bulk uploads.
              </p>
           </Card>
         </div>
