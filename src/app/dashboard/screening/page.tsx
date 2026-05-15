@@ -1,4 +1,3 @@
-
 "use client"
 
 import { ResumeAnalyzer } from "@/components/ai/resume-analyzer";
@@ -51,7 +50,7 @@ Key Requirements:
         </div>
       </div>
 
-      <Alert className="bg-primary/5 border-primary/20 rounded-3xl p-6 border-2">
+      <Alert className="bg-primary/5 border-primary/20 rounded-[2.5rem] p-6 border-2">
         <Info className="h-5 w-5 text-primary" />
         <AlertTitle className="text-foreground font-black font-headline text-lg">Screening Strategy</AlertTitle>
         <AlertDescription className="text-muted-foreground font-medium mt-1">
@@ -77,19 +76,19 @@ Key Requirements:
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div className="lg:col-span-4 space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-foreground font-black uppercase tracking-widest text-[10px]">Select Target Job</Label>
+                    <Label className="text-foreground font-black uppercase tracking-[0.2em] text-[10px]">Select Target Job</Label>
                     {loadingJobs ? (
                       <div className="flex items-center gap-2 text-sm text-muted-foreground h-12">
                         <Loader2 className="h-4 w-4 animate-spin" /> Loading positions...
                       </div>
                     ) : (
                       <Select onValueChange={handleJobChange} value={selectedJobId}>
-                        <SelectTrigger className="h-12 bg-muted/20 border-none rounded-xl focus:ring-primary">
+                        <SelectTrigger className="h-12 bg-muted/20 border-none rounded-xl focus:ring-primary font-bold text-foreground">
                           <SelectValue placeholder="Choose a position..." />
                         </SelectTrigger>
                         <SelectContent className="rounded-2xl">
                           {jobs?.map((job: any) => (
-                            <SelectItem key={job.id} value={job.id} className="rounded-lg">{job.title}</SelectItem>
+                            <SelectItem key={job.id} value={job.id} className="rounded-lg font-medium">{job.title}</SelectItem>
                           ))}
                           {jobs?.length === 0 && (
                             <SelectItem value="none" disabled>No active jobs found</SelectItem>
@@ -100,11 +99,11 @@ Key Requirements:
                   </div>
                 </div>
                 <div className="lg:col-span-8 space-y-2">
-                  <Label htmlFor="jd" className="text-foreground font-black uppercase tracking-widest text-[10px]">Reference Job Description</Label>
+                  <Label htmlFor="jd" className="text-foreground font-black uppercase tracking-[0.2em] text-[10px]">Reference Job Description</Label>
                   <Textarea 
                     id="jd" 
                     placeholder="Paste your job description here..." 
-                    className="min-h-[120px] bg-muted/20 border-none rounded-2xl text-sm leading-relaxed focus-visible:ring-primary"
+                    className="min-h-[160px] bg-background/50 border-border rounded-2xl text-sm leading-relaxed focus-visible:ring-primary font-medium text-foreground resize-none"
                     value={jd}
                     onChange={(e) => setJd(e.target.value)}
                   />

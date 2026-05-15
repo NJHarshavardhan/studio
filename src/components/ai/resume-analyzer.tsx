@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react";
@@ -163,9 +162,9 @@ export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: Res
   return (
     <div className="space-y-8">
       {quotaWait !== null && (
-        <Alert variant="destructive" className="bg-amber-500/10 border-amber-500/20 text-amber-600 rounded-3xl animate-in fade-in slide-in-from-top-2">
+        <Alert variant="destructive" className="bg-amber-500/10 border-amber-500/20 text-amber-600 rounded-[2rem] animate-in fade-in slide-in-from-top-2">
           <RefreshCw className="h-5 w-5 animate-spin text-amber-500" />
-          <AlertTitle className="font-black font-headline">AI Quota Cooling Down</AlertTitle>
+          <AlertTitle className="font-black font-headline text-lg">AI Quota Cooling Down</AlertTitle>
           <AlertDescription className="text-sm font-medium">
             Gemini Free Tier has a limit. Please wait <strong>{quotaWait}s</strong> before analyzing another file.
           </AlertDescription>
@@ -229,7 +228,7 @@ export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: Res
                        <CardTitle className="text-3xl md:text-5xl font-black font-headline text-foreground tracking-tight leading-none">
                          {result.extractedInfo.name || "Candidate Name"}
                        </CardTitle>
-                       <p className="text-muted-foreground font-medium mt-2 text-sm md:text-base uppercase tracking-widest font-headline">AI-Analyzed Talent Profile</p>
+                       <p className="text-muted-foreground font-bold mt-2 text-sm md:text-base uppercase tracking-[0.3em] font-headline">AI Talent Intelligence</p>
                      </div>
                      <div className="flex flex-wrap justify-center sm:justify-start gap-x-8 gap-y-3">
                         <div className="flex items-center gap-2.5 text-muted-foreground font-bold">
@@ -284,11 +283,13 @@ export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: Res
                           <span className="text-xl font-black text-muted-foreground/50">%</span>
                         </div>
                       </div>
-                      <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
+                      <div className="h-4 w-full bg-muted rounded-full overflow-hidden shadow-inner">
                         <div 
                           className={cn(
                             "h-full transition-all duration-1000 ease-out",
-                            result.matchScore > 80 ? "bg-emerald-500" : result.matchScore > 60 ? "bg-amber-500" : "bg-red-500"
+                            result.matchScore > 80 ? "bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]" : 
+                            result.matchScore > 60 ? "bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.5)]" : 
+                            "bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]"
                           )} 
                           style={{ width: `${result.matchScore}%` }} 
                         />
