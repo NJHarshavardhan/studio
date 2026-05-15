@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useRef } from "react";
@@ -67,22 +66,22 @@ export default function ProfilePage() {
   return (
     <div className="space-y-8 max-w-3xl">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">User Profile</h1>
-        <p className="text-slate-500">Manage your personal account details and preferences.</p>
+        <h1 className="text-3xl font-black tracking-tight text-foreground">User Profile</h1>
+        <p className="text-muted-foreground">Manage your personal account details and preferences.</p>
       </div>
 
       <div className="grid gap-8">
-        <Card className="border-none shadow-sm">
-          <CardHeader>
-            <CardTitle>Public Information</CardTitle>
-            <CardDescription>This information will be visible to your team members.</CardDescription>
+        <Card className="border-none shadow-sm bg-card rounded-[32px] overflow-hidden">
+          <CardHeader className="bg-muted/20 border-b">
+            <CardTitle className="text-foreground font-black">Public Information</CardTitle>
+            <CardDescription className="text-muted-foreground font-medium">This information will be visible to your team members.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center gap-6 pb-6 border-b">
+          <CardContent className="space-y-8 p-8">
+            <div className="flex items-center gap-8 pb-8 border-b border-border">
               <div className="relative group">
-                <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
+                <Avatar className="h-28 w-28 border-4 border-card shadow-2xl">
                   <AvatarImage src={avatarUrl} className="object-cover" />
-                  <AvatarFallback className="bg-primary/10 text-primary text-3xl font-bold">
+                  <AvatarFallback className="bg-primary/10 text-primary text-4xl font-black">
                     {profile.name.split(' ').map(n => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
@@ -90,10 +89,10 @@ export default function ProfilePage() {
                   onClick={triggerFileInput}
                   className="absolute inset-0 flex items-center justify-center bg-black/40 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  <Camera className="h-6 w-6" />
+                  <Camera className="h-8 w-8" />
                 </button>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Input 
                   type="file" 
                   ref={fileInputRef} 
@@ -101,53 +100,53 @@ export default function ProfilePage() {
                   accept="image/*" 
                   onChange={handleAvatarChange} 
                 />
-                <Button size="sm" variant="outline" onClick={triggerFileInput} disabled={isUploading}>
+                <Button size="sm" variant="outline" onClick={triggerFileInput} disabled={isUploading} className="rounded-xl h-10 px-6 font-bold">
                   {isUploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Camera className="h-4 w-4 mr-2" />}
                   Change Avatar
                 </Button>
-                <p className="text-[10px] text-slate-400">JPG, PNG or GIF. Max size 2MB.</p>
+                <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">JPG, PNG or GIF. Max 2MB.</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-2">
-                <Label className="text-slate-700">Full Name</Label>
+                <Label className="text-foreground font-bold">Full Name</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input 
                     value={profile.name} 
                     onChange={(e) => setProfile({...profile, name: e.target.value})}
-                    className="pl-10 h-11 bg-slate-50 border-none focus-visible:ring-1" 
+                    className="pl-12 h-12 bg-muted/20 border-border rounded-xl font-medium focus-visible:ring-primary" 
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-700">Work Email</Label>
+                <Label className="text-foreground font-bold">Work Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input 
                     value={profile.email} 
                     onChange={(e) => setProfile({...profile, email: e.target.value})}
-                    className="pl-10 h-11 bg-slate-50 border-none focus-visible:ring-1" 
+                    className="pl-12 h-12 bg-muted/20 border-border rounded-xl font-medium focus-visible:ring-primary" 
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-700">Job Title</Label>
+                <Label className="text-foreground font-bold">Job Title</Label>
                 <div className="relative">
-                  <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input 
                     value={profile.title} 
                     onChange={(e) => setProfile({...profile, title: e.target.value})}
-                    className="pl-10 h-11 bg-slate-50 border-none focus-visible:ring-1" 
+                    className="pl-12 h-12 bg-muted/20 border-border rounded-xl font-medium focus-visible:ring-primary" 
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-700">Access Role</Label>
+                <Label className="text-foreground font-bold">Access Role</Label>
                 <div className="relative">
-                  <Shield className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input value="Admin" disabled className="pl-10 h-11 bg-slate-100 border-none opacity-70" />
+                  <Shield className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input value="Admin" disabled className="pl-12 h-12 bg-muted/50 border-border rounded-xl font-bold opacity-70" />
                 </div>
               </div>
             </div>
@@ -155,9 +154,9 @@ export default function ProfilePage() {
         </Card>
 
         <div className="flex justify-end gap-3">
-          <Button variant="outline" className="h-11 px-8" disabled={isSaving}>Cancel</Button>
+          <Button variant="outline" className="h-12 rounded-xl px-10 font-bold" disabled={isSaving}>Cancel</Button>
           <Button 
-            className="h-11 px-8 shadow-lg shadow-primary/20" 
+            className="h-12 rounded-xl px-10 font-black shadow-lg shadow-primary/20" 
             onClick={handleUpdateProfile}
             disabled={isSaving}
           >

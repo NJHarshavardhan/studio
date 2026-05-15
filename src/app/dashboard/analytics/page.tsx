@@ -73,17 +73,17 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Recruitment Analytics</h1>
-        <p className="text-slate-500">In-depth performance metrics for your hiring pipeline.</p>
+        <h1 className="text-3xl font-black tracking-tight text-foreground">Recruitment Analytics</h1>
+        <p className="text-muted-foreground">In-depth performance metrics for your hiring pipeline.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[1, 2, 3].map((i) => (
-          <Card key={i} className="border-none shadow-sm">
+          <Card key={i} className="border-none shadow-sm bg-card">
             <CardHeader className="pb-2">
               <Skeleton className="h-3 w-24 mb-2" />
               {isLoading ? <Skeleton className="h-10 w-20" /> : (
-                <CardTitle className="text-3xl font-bold">
+                <CardTitle className="text-3xl font-black text-foreground">
                   {i === 1 ? (candidates?.length ? Math.round(candidates.reduce((acc, curr: any) => acc + (curr.matchScore || 0), 0) / candidates.length) : 0) + "%" :
                    i === 2 ? (candidates?.length ? Math.round((candidates.filter((c: any) => c.currentStage === "Selected").length / candidates.length) * 100) : 0) + "%" :
                    candidates?.length || 0}
@@ -98,12 +98,12 @@ export default function AnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border-none shadow-sm">
+        <Card className="border-none shadow-sm bg-card">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
+            <CardTitle className="text-lg font-black flex items-center gap-2 text-foreground">
               <TrendingUp className="h-5 w-5 text-primary" /> Candidate Funnel
             </CardTitle>
-            <CardDescription>Distribution of candidates across pipeline stages</CardDescription>
+            <CardDescription className="text-muted-foreground font-medium">Distribution of candidates across pipeline stages</CardDescription>
           </CardHeader>
           <CardContent className="h-[350px]">
             {isLoading ? (
@@ -121,36 +121,36 @@ export default function AnalyticsPage() {
             ) : candidates?.length ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={pipelineData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#f1f5f9" />
+                  <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="hsl(var(--border))" />
                   <XAxis type="number" hide />
-                  <YAxis dataKey="name" type="category" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} width={100} />
+                  <YAxis dataKey="name" type="category" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} width={100} />
                   <Tooltip 
-                    cursor={{ fill: '#f8fafc' }}
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                    cursor={{ fill: 'hsl(var(--muted)/0.1)' }}
+                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', backgroundColor: 'hsl(var(--card))' }}
                   />
-                  <Bar dataKey="count" fill="#3B82F6" radius={[0, 4, 4, 0]} barSize={30} />
+                  <Bar dataKey="count" fill="hsl(var(--primary))" radius={[0, 8, 8, 0]} barSize={30} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-full text-slate-400 italic text-sm border-2 border-dashed rounded-xl">
+              <div className="flex items-center justify-center h-full text-muted-foreground italic text-sm border-2 border-dashed border-border rounded-3xl">
                 No pipeline data available yet.
               </div>
             )}
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm">
+        <Card className="border-none shadow-sm bg-card">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <PieChartIcon className="h-5 w-5 text-indigo-500" /> AI Interview Scores
+            <CardTitle className="text-lg font-black flex items-center gap-2 text-foreground">
+              <PieChartIcon className="h-5 w-5 text-primary" /> AI Interview Scores
             </CardTitle>
-            <CardDescription>Performance breakdown of AI screening sessions</CardDescription>
+            <CardDescription className="text-muted-foreground font-medium">Performance breakdown of AI screening sessions</CardDescription>
           </CardHeader>
           <CardContent className="h-[350px] flex items-center justify-center">
             {isLoading ? (
               <div className="relative h-48 w-48 flex items-center justify-center">
                  <Skeleton className="h-full w-full rounded-full" />
-                 <div className="absolute h-32 w-32 rounded-full bg-background" />
+                 <div className="absolute h-32 w-32 rounded-full bg-card" />
               </div>
             ) : interviews?.length ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -169,12 +169,12 @@ export default function AnalyticsPage() {
                     ))}
                   </Pie>
                   <Tooltip 
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', backgroundColor: 'hsl(var(--card))' }}
                   />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-full w-full text-slate-400 italic text-sm border-2 border-dashed rounded-xl">
+              <div className="flex items-center justify-center h-full w-full text-muted-foreground italic text-sm border-2 border-dashed border-border rounded-3xl">
                 No interview data available yet.
               </div>
             )}
