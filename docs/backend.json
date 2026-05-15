@@ -60,6 +60,19 @@
         "sentAt": { "type": "string", "format": "date-time" }
       },
       "required": ["candidateEmail", "subject", "body", "sentAt"]
+    },
+    "WhatsAppLog": {
+      "title": "WhatsApp Log",
+      "description": "A record of WhatsApp messages sent to candidates.",
+      "type": "object",
+      "properties": {
+        "candidatePhone": { "type": "string" },
+        "candidateName": { "type": "string" },
+        "body": { "type": "string" },
+        "type": { "type": "string" },
+        "sentAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["candidatePhone", "candidateName", "body", "sentAt"]
     }
   },
   "auth": {
@@ -81,6 +94,10 @@
     "/emails/{emailId}": {
       "schema": "EmailLog",
       "description": "Audit log of all AI-generated recruitment emails."
+    },
+    "/whatsapp_logs/{logId}": {
+      "schema": "WhatsAppLog",
+      "description": "Audit log of all AI-generated recruitment WhatsApp messages."
     }
   }
 }

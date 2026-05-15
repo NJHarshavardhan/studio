@@ -1,11 +1,13 @@
+
 "use client"
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { FileUp, Loader2, CheckCircle2, AlertCircle, Mail, Phone, Calendar, RefreshCw } from "lucide-react";
+import { FileUp, Loader2, CheckCircle2, AlertCircle, Mail, Phone, Calendar, RefreshCw, MessageCircle } from "lucide-react";
 import { aiResumeMatcherAndAnalyzer, type AiResumeMatcherAndAnalyzerOutput } from "@/ai/flows/ai-resume-matcher-and-analyzer";
+import { sendWhatsAppUpdate } from "@/ai/flows/send-whatsapp-update";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { useFirestore } from "@/firebase";
@@ -93,7 +95,7 @@ export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: Res
     reader.readAsDataURL(file);
   };
 
-  const handleApprove = () => {
+  const handleApprove = async () => {
     if (!result || !firestore) return;
     setIsApproving(true);
 
@@ -113,25 +115,50 @@ export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: Res
     };
 
     const candidatesCol = collection(firestore, "candidates");
+    const whatsappCol = collection(firestore, "whatsapp_logs");
 
-    // NON-BLOCKING MUTATION: Initiate the write and immediately proceed
-    addDoc(candidatesCol, candidateData)
-      .catch((serverError) => {
-        const permissionError = new FirestorePermissionError({
-          path: candidatesCol.path,
-          operation: 'create',
-          requestResourceData: candidateData,
-        } satisfies SecurityRuleContext);
-        errorEmitter.emit('permission-error', permissionError);
+    try {
+      // 1. Save Candidate
+      const docRef = await addDoc(candidatesCol, candidateData);
+
+      // 2. Trigger WhatsApp Update
+      if (candidateData.phone && candidateData.phone !== "Not provided") {
+        const waResult = await sendWhatsAppUpdate({
+          candidateName: candidateData.name,
+          candidatePhone: candidateData.phone,
+          type: 'shortlisted',
+          jobTitle: 'Selected Role'
+        });
+
+        await addDoc(whatsappCol, {
+          candidatePhone: candidateData.phone,
+          candidateName: candidateData.name,
+          body: waResult.body,
+          type: 'shortlisted',
+          sentAt: new Date().toISOString()
+        });
+
+        toast({
+          title: "WhatsApp Sent",
+          description: `Shortlist notification sent to ${candidateData.name} via mobile.`,
+        });
+      }
+
+      toast({
+        title: "Candidate Shortlisted",
+        description: `${candidateData.name} has been added successfully.`,
       });
 
-    toast({
-      title: "Candidate Shortlisted",
-      description: `${candidateData.name} has been added successfully.`,
-    });
-    
-    // Immediate optimistic navigation to prevent button hang
-    router.push("/dashboard/candidates");
+      router.push("/dashboard/candidates");
+    } catch (e: any) {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: candidatesCol.path,
+        operation: 'create',
+        requestResourceData: candidateData,
+      } satisfies SecurityRuleContext));
+    } finally {
+      setIsApproving(false);
+    }
   };
 
   return (
@@ -205,6 +232,11 @@ export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: Res
                         <span className="text-sm text-muted-foreground font-bold flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-primary/60" /> {result.extractedInfo.yearsOfExperience}y Exp
                         </span>
+                        {result.extractedInfo.phone && (
+                          <span className="text-sm text-emerald-600 font-bold flex items-center gap-2">
+                            <MessageCircle className="h-4 w-4" /> {result.extractedInfo.phone}
+                          </span>
+                        )}
                      </div>
                    </div>
                  </div>
@@ -234,6 +266,13 @@ export function ResumeAnalyzer({ jobDescription, jobId = "default-job-id" }: Res
                       <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6">AI Profile Insight</h4>
                       <p className="text-base text-foreground font-medium leading-relaxed italic">"{result.extractedInfo.candidateSummary}"</p>
                     </div>
+                    <Alert className="bg-primary/5 border-primary/10 rounded-2xl">
+                       <MessageCircle className="h-4 w-4 text-primary" />
+                       <AlertTitle className="text-primary font-bold">WhatsApp Enabled</AlertTitle>
+                       <AlertDescription className="text-xs font-medium">
+                         Approving this candidate will trigger an automated WhatsApp welcome message to their mobile.
+                       </AlertDescription>
+                    </Alert>
                   </div>
                   <div className="space-y-12">
                     <div>
