@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from "react";
@@ -38,6 +39,7 @@ export default function Dashboard() {
   const { toast } = useToast();
   
   useEffect(() => {
+    // Generate random heights once on mount to avoid hydration mismatch
     setSkeletonHeights(Array.from({ length: 7 }, () => Math.floor(Math.random() * 60) + 20));
   }, []);
 
@@ -107,6 +109,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
+      {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">Overview</h1>
@@ -128,6 +131,7 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {stats.map((stat) => (
           <Card key={stat.title} className="border-none shadow-sm hover:shadow-md transition-all duration-300 group rounded-2xl overflow-hidden bg-card">
@@ -159,6 +163,7 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="border-none shadow-sm rounded-2xl bg-card">
           <CardHeader className="pb-0">
@@ -244,7 +249,9 @@ export default function Dashboard() {
         </Card>
       </div>
 
+      {/* Main Grid: Talent Matches + Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Talent Matches Feed */}
         <Card className="lg:col-span-2 border-none shadow-sm rounded-2xl bg-card overflow-hidden">
           <CardHeader className="border-b bg-muted/20">
             <CardTitle className="text-xl font-bold flex items-center gap-2">
@@ -303,21 +310,34 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
+        {/* Sidebar Actions & Pro Tip */}
         <div className="space-y-6">
           <Card className="border-none shadow-sm rounded-2xl bg-card p-6">
             <CardTitle className="text-lg font-bold mb-5">Pipeline Actions</CardTitle>
             <div className="space-y-3">
-               <Button variant="outline" className="w-full justify-start h-12 rounded-xl group hover:border-primary/50 transition-all" onClick={() => window.location.href='/dashboard/jobs'}>
-                 <Briefcase className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary transition-colors" /> 
-                 <span className="font-bold text-slate-700">Create New Position</span>
+               <Button 
+                variant="outline" 
+                className="w-full justify-start h-12 rounded-xl group hover:border-primary/50 transition-all px-4" 
+                onClick={() => window.location.href='/dashboard/jobs'}
+              >
+                 <Briefcase className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
+                 <span className="font-bold text-slate-700 truncate">Create New Position</span>
                </Button>
-               <Button variant="outline" className="w-full justify-start h-12 rounded-xl group hover:border-primary/50 transition-all" onClick={() => window.location.href='/dashboard/screening'}>
-                 <Bot className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary transition-colors" /> 
-                 <span className="font-bold text-slate-700">Start AI Screening</span>
+               <Button 
+                variant="outline" 
+                className="w-full justify-start h-12 rounded-xl group hover:border-primary/50 transition-all px-4" 
+                onClick={() => window.location.href='/dashboard/screening'}
+              >
+                 <Bot className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
+                 <span className="font-bold text-slate-700 truncate">Start AI Screening</span>
                </Button>
-               <Button variant="outline" className="w-full justify-start h-12 rounded-xl group hover:border-primary/50 transition-all" onClick={() => window.location.href='/dashboard/analytics'}>
-                 <PieChart className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary transition-colors" /> 
-                 <span className="font-bold text-slate-700">Detailed Metrics</span>
+               <Button 
+                variant="outline" 
+                className="w-full justify-start h-12 rounded-xl group hover:border-primary/50 transition-all px-4" 
+                onClick={() => window.location.href='/dashboard/analytics'}
+              >
+                 <PieChart className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
+                 <span className="font-bold text-slate-700 truncate">Detailed Metrics</span>
                </Button>
             </div>
           </Card>
