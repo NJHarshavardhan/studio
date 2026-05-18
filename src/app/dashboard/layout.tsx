@@ -1,12 +1,16 @@
+
 "use client"
 
 import { SidebarNav } from "@/components/dashboard/sidebar-nav";
-import { Heart, Bell, User, Menu, Sparkles } from "lucide-react";
+import { Heart, Bell, User, Menu, Sparkles, LogOut, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { useUser, useAuth } from "@/firebase";
+import { useRouter } from "next/navigation";
+import { signOut } from "firebase/auth";
 
 export default function DashboardLayout({
   children,
@@ -14,6 +18,31 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, loading } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push('/login');
+  };
+
+  if (loading) {
+    return (
+      <div className="h-screen w-full flex flex-col items-center justify-center bg-background liquid-gradient">
+        <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+        <p className="font-headline font-black text-foreground uppercase tracking-widest text-xs">Synchronizing Neural Session...</p>
+      </div>
+    );
+  }
+
+  if (!user) return null;
 
   return (
     <div className="flex h-screen bg-background relative overflow-hidden liquid-gradient">
@@ -33,12 +62,15 @@ export default function DashboardLayout({
         <div className="p-6">
           <div className="flex items-center gap-4 p-3.5 rounded-3xl bg-white/10 dark:bg-black/20 border border-white/20 dark:border-white/5 hover:bg-white/20 dark:hover:bg-black/40 transition-all cursor-pointer group backdrop-blur-md">
             <div className="h-10 w-10 rounded-xl bg-primary text-white flex items-center justify-center font-black text-xs shadow-xl shadow-primary/20 group-hover:scale-105 transition-transform">
-              JD
+              {user.displayName ? user.displayName[0] : user.email ? user.email[0].toUpperCase() : 'U'}
             </div>
-            <div className="flex flex-col min-w-0">
-              <span className="text-sm font-black truncate leading-none mb-1 text-foreground">Jane Doe</span>
+            <div className="flex flex-col min-w-0 flex-1">
+              <span className="text-sm font-black truncate leading-none mb-1 text-foreground">{user.displayName || "User"}</span>
               <span className="text-[9px] text-primary truncate uppercase font-black tracking-[0.2em]">HR Director</span>
             </div>
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10" onClick={handleLogout}>
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </aside>
@@ -75,7 +107,7 @@ export default function DashboardLayout({
 
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/5 text-primary border border-primary/10 backdrop-blur-md">
               <Sparkles className="h-3 w-3" />
-              <span className="text-[8px] font-black uppercase tracking-[0.2em]">Liquid AI Core</span>
+              <span className="text-[8px] font-black uppercase tracking-[0.2em]">Neural AI Active</span>
             </div>
           </div>
 

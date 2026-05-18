@@ -1,8 +1,14 @@
+
+"use client"
+
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Bot, BarChart3, ShieldCheck, Sparkles, CheckCircle2, Heart } from "lucide-react";
+import { ArrowRight, Bot, BarChart3, ShieldCheck, Sparkles, CheckCircle2, Heart, Loader2 } from "lucide-react";
+import { useUser } from '@/firebase';
 
 export default function Home() {
+  const { user, loading } = useUser();
+
   return (
     <div className="flex flex-col min-h-screen bg-background relative overflow-x-hidden liquid-gradient">
       <header className="px-6 lg:px-12 h-16 flex items-center justify-between sticky top-4 z-50 glass-morphism mx-4 rounded-[1.5rem] border-none transition-all duration-300 shadow-2xl">
@@ -20,12 +26,22 @@ export default function Home() {
             Platform
           </Link>
           <div className="h-5 w-px bg-white/20" />
-          <Link href="/login">
-            <Button variant="ghost" className="font-black uppercase tracking-[0.2em] text-[10px] font-headline hover:bg-white/20 h-10">Sign In</Button>
-          </Link>
-          <Link href="/dashboard">
-            <Button className="rounded-full px-8 font-black shadow-[0_10px_30px_rgba(255,51,102,0.3)] h-10 text-xs font-headline">Get Started</Button>
-          </Link>
+          {loading ? (
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          ) : user ? (
+            <Link href="/dashboard">
+              <Button className="rounded-full px-8 font-black shadow-[0_10px_30px_rgba(255,51,102,0.3)] h-10 text-xs font-headline">Enter Dashboard</Button>
+            </Link>
+          ) : (
+            <>
+              <Link href="/login">
+                <Button variant="ghost" className="font-black uppercase tracking-[0.2em] text-[10px] font-headline hover:bg-white/20 h-10">Sign In</Button>
+              </Link>
+              <Link href="/signup">
+                <Button className="rounded-full px-8 font-black shadow-[0_10px_30px_rgba(255,51,102,0.3)] h-10 text-xs font-headline">Get Started</Button>
+              </Link>
+            </>
+          )}
         </nav>
         <Button variant="ghost" size="icon" className="md:hidden glass-morphism border-none h-10 w-10 rounded-xl">
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
@@ -37,7 +53,7 @@ export default function Home() {
           <div className="container px-8 mx-auto relative">
             <div className="flex flex-col items-center text-center space-y-12 max-w-5xl mx-auto">
               <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full glass-morphism text-primary text-[9px] font-black uppercase tracking-[0.4em] animate-in fade-in slide-in-from-bottom-4 duration-1000 border-none">
-                <Sparkles className="h-3.5 w-3.5" /> The Future of Liquid HR
+                <Sparkles className="h-3.5 w-3.5" /> The Future of Neural HR
               </div>
               <h1 className="text-5xl md:text-[7rem] font-black tracking-tight font-headline text-foreground leading-[0.9] animate-in fade-in slide-in-from-bottom-8 duration-1000 drop-shadow-sm">
                 Hire without <br />
@@ -48,8 +64,8 @@ export default function Home() {
               </p>
               <div className="flex flex-col sm:flex-row gap-6 pt-6 w-full sm:w-auto animate-in fade-in slide-in-from-bottom-16 duration-1000">
                 <Button size="lg" className="h-14 px-12 rounded-full text-lg font-black shadow-[0_20px_50px_rgba(255,51,102,0.4)] group bg-primary transition-all hover:scale-105 active:scale-95 font-headline" asChild>
-                  <Link href="/dashboard">
-                    Enter Platform <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1.5 transition-transform" />
+                  <Link href={user ? "/dashboard" : "/signup"}>
+                    {user ? "Enter Dashboard" : "Get Started Now"} <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1.5 transition-transform" />
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" className="h-14 px-12 rounded-full text-lg font-black glass-morphism border-none shadow-xl transition-all hover:scale-105 active:scale-95 font-headline" asChild>
@@ -104,9 +120,9 @@ export default function Home() {
                   <span className="text-primary italic">talent flow.</span>
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl w-full">
-                  <Link href="/dashboard" className="w-full">
+                  <Link href={user ? "/dashboard" : "/signup"} className="w-full">
                     <Button className="w-full h-14 rounded-full text-lg font-black bg-white text-foreground hover:bg-slate-100 transition-all shadow-2xl hover:scale-105 active:scale-95 font-headline">
-                      Launch HR
+                      {user ? "Enter Dashboard" : "Launch HR"}
                     </Button>
                   </Link>
                   <Link href="/candidate/portal" className="w-full">
@@ -136,7 +152,7 @@ export default function Home() {
             </div>
             <span className="font-black text-xl tracking-tighter text-foreground font-headline">HireStack</span>
           </div>
-          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] font-headline">© 2025 Liquid HR Systems • Engineered with Love.</p>
+          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] font-headline">© 2025 Neural HR Systems • Engineered with Love.</p>
           <div className="flex gap-8">
             {['Terms', 'Privacy', 'Contact'].map(link => (
               <Link key={link} className="text-[9px] font-black text-muted-foreground hover:text-primary transition-colors uppercase tracking-[0.3em] font-headline" href="#">{link}</Link>

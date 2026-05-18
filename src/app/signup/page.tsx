@@ -10,10 +10,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-export default function LoginPage() {
+export default function SignupPage() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -21,16 +22,17 @@ export default function LoginPage() {
   const router = useRouter();
   const auth = useAuth();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-    
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(userCredential.user, { displayName: name });
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.message || "Failed to sign in. Please check your credentials.");
+      setError(err.message || "Failed to create account. Please try again.");
       setIsLoading(false);
     }
   };
@@ -49,15 +51,15 @@ export default function LoginPage() {
             <span className="font-black text-4xl tracking-tighter font-headline text-foreground">HireStack</span>
           </Link>
           <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full glass-morphism text-primary text-[9px] font-black uppercase tracking-[0.3em] border-none">
-            <Sparkles className="h-4 w-4" /> Secure Recruitment Portal
+            <Sparkles className="h-4 w-4" /> Start Your AI Journey
           </div>
         </div>
 
         <Card className="glass-morphism rounded-[3.5rem] overflow-hidden border-none shadow-2xl">
           <div className="h-2.5 bg-gradient-to-r from-primary via-accent to-primary animate-liquid" />
           <CardHeader className="pt-12 px-10 text-center space-y-2">
-            <CardTitle className="text-3xl font-black text-foreground font-headline">Welcome back</CardTitle>
-            <CardDescription className="text-muted-foreground font-bold text-base">Access your HR dashboard and talent matches.</CardDescription>
+            <CardTitle className="text-3xl font-black text-foreground font-headline">Create Account</CardTitle>
+            <CardDescription className="text-muted-foreground font-bold text-base">Join the future of automated recruitment.</CardDescription>
           </CardHeader>
           <CardContent className="px-10 pb-14 pt-8">
             {error && (
@@ -66,8 +68,18 @@ export default function LoginPage() {
                 <AlertDescription className="text-xs font-bold">{error}</AlertDescription>
               </Alert>
             )}
-            <form onSubmit={handleLogin} className="space-y-6">
+            <form onSubmit={handleSignup} className="space-y-6">
               <div className="space-y-5">
+                <div className="space-y-2.5">
+                  <Label className="text-[10px] font-black text-foreground uppercase tracking-[0.3em] font-headline ml-1">Full Name</Label>
+                  <Input 
+                    placeholder="Jane Doe" 
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="h-14 rounded-2xl text-base px-6 bg-white/40 dark:bg-black/20 border-white/40 dark:border-white/10 focus-visible:ring-primary shadow-inner font-medium"
+                  />
+                </div>
                 <div className="space-y-2.5">
                   <Label className="text-[10px] font-black text-foreground uppercase tracking-[0.3em] font-headline ml-1">Work Email</Label>
                   <Input 
@@ -80,10 +92,7 @@ export default function LoginPage() {
                   />
                 </div>
                 <div className="space-y-2.5">
-                  <div className="flex items-center justify-between px-1">
-                    <Label className="text-[10px] font-black text-foreground uppercase tracking-[0.3em] font-headline">Password</Label>
-                    <button type="button" className="text-[9px] font-black text-primary hover:underline uppercase tracking-[0.2em] font-headline">Reset</button>
-                  </div>
+                  <Label className="text-[10px] font-black text-foreground uppercase tracking-[0.3em] font-headline ml-1">Password</Label>
                   <Input 
                     type="password"
                     required
@@ -94,15 +103,15 @@ export default function LoginPage() {
                 </div>
               </div>
               <Button type="submit" className="w-full h-15 text-lg font-black rounded-[1.75rem] shadow-2xl shadow-primary/20 bg-primary hover:bg-primary/90 transition-all active:scale-[0.98] font-headline" disabled={isLoading}>
-                {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <>Sign In <ArrowRight className="ml-2 h-6 w-6" /></>}
+                {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <>Create Account <ArrowRight className="ml-2 h-6 w-6" /></>}
               </Button>
             </form>
 
             <div className="mt-10 pt-10 border-t border-white/10 flex flex-col items-center space-y-5">
-              <p className="text-xs text-muted-foreground font-bold">New to HireStack?</p>
-              <Link href="/signup" className="w-full">
+              <p className="text-xs text-muted-foreground font-bold">Already have an account?</p>
+              <Link href="/login" className="w-full">
                 <Button variant="outline" className="w-full h-13 rounded-2xl font-black glass-morphism border-none text-foreground uppercase tracking-[0.2em] text-[10px] font-headline hover:bg-white/20">
-                  Create Organization Account
+                  Sign In to Dashboard
                 </Button>
               </Link>
             </div>
