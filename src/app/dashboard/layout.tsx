@@ -17,8 +17,8 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen bg-background relative overflow-hidden liquid-gradient">
-      {/* Desktop Sidebar - Glass Component */}
-      <aside className="hidden lg:flex w-72 flex-col fixed inset-y-4 left-4 z-50 glass-morphism rounded-[2.5rem] overflow-hidden border-none shadow-2xl">
+      {/* Desktop Sidebar - Premium Floating Glass */}
+      <aside className="hidden lg:flex w-72 flex-col fixed inset-y-4 left-4 z-50 glass-morphism rounded-[2.5rem] overflow-hidden border-none shadow-2xl bg-gradient-to-b from-white/20 to-white/5 dark:from-black/40 dark:to-black/20">
         <div className="h-20 flex items-center px-8 shrink-0">
           <Link href="/dashboard" className="flex items-center space-x-3">
             <div className="bg-primary p-2 rounded-xl shadow-2xl shadow-primary/20">
@@ -54,7 +54,7 @@ export default function DashboardLayout({
                   <Menu className="h-5 w-5 text-foreground" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="p-0 w-80 glass-morphism border-none rounded-r-[3rem] overflow-hidden">
+              <SheetContent side="left" className="p-0 w-80 glass-morphism border-none rounded-r-[3rem] overflow-hidden bg-gradient-to-b from-white/40 to-white/10 dark:from-black/60 dark:to-black/30">
                 <SheetHeader className="sr-only">
                   <SheetTitle>Navigation Menu</SheetTitle>
                   <SheetDescription>Access recruitment pipeline and automated tools.</SheetDescription>
