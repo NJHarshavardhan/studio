@@ -32,47 +32,27 @@
       },
       "required": ["title", "description", "status"]
     },
-    "InterviewSession": {
-      "title": "Interview Session",
-      "description": "A record of an AI-driven interview session.",
+    "Subscription": {
+      "title": "Subscription",
+      "description": "Subscription details for the organization.",
       "type": "object",
       "properties": {
-        "candidateId": { "type": "string" },
-        "jobId": { "type": "string" },
-        "status": { "type": "string", "enum": ["pending", "completed"] },
-        "score": { "type": "number" },
-        "summary": { "type": "string" },
-        "transcript": { "type": "string" },
-        "completedAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["candidateId", "jobId", "status"]
+        "userId": { "type": "string" },
+        "planId": { "type": "string", "enum": ["free", "starter", "pro"] },
+        "candidateLimit": { "type": "number" },
+        "candidateCount": { "type": "number" },
+        "status": { "type": "string" }
+      }
     },
-    "EmailLog": {
-      "title": "Email Log",
-      "description": "A record of emails sent to candidates via the AI system.",
+    "AdminConfig": {
+      "title": "Admin Configuration",
+      "description": "Global settings for the HireStack platform.",
       "type": "object",
       "properties": {
-        "candidateEmail": { "type": "string" },
-        "candidateName": { "type": "string" },
-        "subject": { "type": "string" },
-        "body": { "type": "string" },
-        "type": { "type": "string" },
-        "sentAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["candidateEmail", "subject", "body", "sentAt"]
-    },
-    "WhatsAppLog": {
-      "title": "WhatsApp Log",
-      "description": "A record of WhatsApp messages sent to candidates.",
-      "type": "object",
-      "properties": {
-        "candidatePhone": { "type": "string" },
-        "candidateName": { "type": "string" },
-        "body": { "type": "string" },
-        "type": { "type": "string" },
-        "sentAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["candidatePhone", "candidateName", "body", "sentAt"]
+        "platformName": { "type": "string" },
+        "aiApiKey": { "type": "string" },
+        "maintenanceMode": { "type": "boolean" }
+      }
     }
   },
   "auth": {
@@ -87,17 +67,13 @@
       "schema": "Job",
       "description": "Collection of job openings."
     },
-    "/interviews/{interviewId}": {
-      "schema": "InterviewSession",
-      "description": "Logs of AI interview sessions."
+    "/subscriptions/{userId}": {
+      "schema": "Subscription",
+      "description": "Individual user or org subscription status."
     },
-    "/emails/{emailId}": {
-      "schema": "EmailLog",
-      "description": "Audit log of all AI-generated recruitment emails."
-    },
-    "/whatsapp_logs/{logId}": {
-      "schema": "WhatsAppLog",
-      "description": "Audit log of all AI-generated recruitment WhatsApp messages."
+    "/admin/config": {
+      "schema": "AdminConfig",
+      "description": "Global platform configuration."
     }
   }
 }

@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link";
@@ -11,8 +12,11 @@ import {
   MessageSquare, 
   Settings, 
   PieChart,
-  Bot
+  Bot,
+  CreditCard,
+  ShieldAlert
 } from "lucide-react";
+import { useUser } from "@/firebase";
 
 const navItems = [
   { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
@@ -22,6 +26,7 @@ const navItems = [
   { name: 'AI Interviews', href: '/dashboard/interviews', icon: Bot },
   { name: 'Messages', href: '/dashboard/messages', icon: MessageSquare },
   { name: 'Analytics', href: '/dashboard/analytics', icon: PieChart },
+  { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 
@@ -31,6 +36,10 @@ interface SidebarNavProps {
 
 export function SidebarNav({ onItemClick }: SidebarNavProps) {
   const pathname = usePathname();
+  const { user } = useUser();
+
+  // Simple admin check - in real app would use custom claims or firestore doc
+  const isAdmin = user?.email === "admin@hirestack.ai";
 
   return (
     <nav className="flex flex-col gap-1 px-3">
@@ -59,6 +68,23 @@ export function SidebarNav({ onItemClick }: SidebarNavProps) {
           </Link>
         );
       })}
+      
+      {isAdmin && (
+        <div className="mt-8 pt-6 border-t border-white/10">
+           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-4 px-4">System</p>
+           <Link
+              href="/admin"
+              onClick={onItemClick}
+              className={cn(
+                "flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all group",
+                pathname === "/admin" ? "bg-amber-500 text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              )}
+            >
+              <ShieldAlert className="h-4 w-4" />
+              Platform Admin
+            </Link>
+        </div>
+      )}
     </nav>
   );
 }
