@@ -23,7 +23,7 @@
     --border: 350 30% 91%;
     --input: 350 30% 91%;
     --ring: 345 85% 60%;
-    --radius: 1.25rem;
+    --radius: 2rem;
     --chart-1: 345 85% 60%;
     --chart-2: 350 70% 50%;
     --chart-3: 330 60% 40%;
@@ -56,18 +56,33 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border/50;
   }
   body {
     @apply bg-background text-foreground font-body antialiased;
+    background-image: 
+      radial-gradient(circle at 10% 20%, hsla(345, 85%, 60%, 0.05) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, hsla(345, 85%, 60%, 0.08) 0%, transparent 40%);
+    background-attachment: fixed;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-headline tracking-tight text-foreground;
   }
 }
 
-/* Custom Theme-Aware Scrollbars */
 @layer utilities {
+  .glass-morphism {
+    @apply bg-white/40 dark:bg-black/40 backdrop-blur-2xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)];
+  }
+  
+  .glass-morphism-card {
+    @apply bg-white/60 dark:bg-zinc-900/40 backdrop-blur-xl border border-white/50 dark:border-white/10 shadow-xl;
+  }
+
+  .liquid-gradient {
+    @apply bg-gradient-to-br from-primary/20 via-background to-accent/30;
+  }
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -77,8 +92,8 @@
   }
 
   ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
   }
 
   ::-webkit-scrollbar-track {
@@ -86,18 +101,17 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/20 rounded-full border-[3px] border-transparent bg-clip-padding hover:bg-muted-foreground/40 transition-colors;
-  }
-
-  .dark ::-webkit-scrollbar-thumb {
-    @apply bg-muted/20 hover:bg-muted/40;
+    @apply bg-primary/20 rounded-full border-[2px] border-transparent bg-clip-padding hover:bg-primary/40 transition-colors;
   }
 }
 
-.glass-morphism {
-  @apply bg-white/70 dark:bg-card/70 backdrop-blur-xl border border-white/20 dark:border-white/5 shadow-xl;
+.animate-liquid {
+  background-size: 200% 200%;
+  animation: liquid 15s ease infinite;
 }
 
-.seasonal-gradient {
-  @apply bg-gradient-to-br from-primary/5 via-background to-accent/20;
+@keyframes liquid {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
