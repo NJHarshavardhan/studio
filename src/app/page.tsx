@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Bot, Users, BarChart3, ShieldCheck, Sparkles, CheckCircle2, Heart } from "lucide-react";
+import { ArrowRight, Bot, BarChart3, ShieldCheck, Sparkles, CheckCircle2, Heart } from "lucide-react";
 
 export default function Home() {
   return (
@@ -17,18 +17,18 @@ export default function Home() {
           <span className="font-black text-3xl tracking-tighter font-headline text-foreground">HireStack</span>
         </Link>
         <nav className="hidden md:flex gap-10 items-center">
-          <Link className="text-sm font-black text-muted-foreground hover:text-primary transition-colors uppercase tracking-[0.2em]" href="/candidate/portal">
+          <Link className="text-sm font-black text-muted-foreground hover:text-primary transition-colors uppercase tracking-[0.2em] font-headline" href="/candidate/portal">
             Talent
           </Link>
-          <Link className="text-sm font-black text-muted-foreground hover:text-primary transition-colors uppercase tracking-[0.2em]" href="/dashboard">
+          <Link className="text-sm font-black text-muted-foreground hover:text-primary transition-colors uppercase tracking-[0.2em] font-headline" href="/dashboard">
             Platform
           </Link>
           <div className="h-6 w-px bg-white/10" />
           <Link href="/login">
-            <Button variant="ghost" className="font-black uppercase tracking-[0.2em] text-xs">Sign In</Button>
+            <Button variant="ghost" className="font-black uppercase tracking-[0.2em] text-xs font-headline">Sign In</Button>
           </Link>
           <Link href="/dashboard">
-            <Button className="rounded-full px-10 font-black shadow-[0_10px_30px_rgba(255,51,102,0.3)] h-14 text-base">Get Started</Button>
+            <Button className="rounded-full px-10 font-black shadow-[0_10px_30px_rgba(255,51,102,0.3)] h-14 text-base font-headline">Get Started</Button>
           </Link>
         </nav>
         <Button variant="ghost" size="icon" className="md:hidden glass-morphism">
@@ -43,7 +43,7 @@ export default function Home() {
               <div className="inline-flex items-center gap-3 px-8 py-3 rounded-full glass-morphism text-primary text-[10px] font-black uppercase tracking-[0.4em] animate-in fade-in slide-in-from-bottom-4 duration-1000">
                 <Sparkles className="h-4 w-4" /> The Future of Liquid HR
               </div>
-              <h1 className="text-7xl md:text-[9rem] font-black tracking-tighter font-headline text-foreground leading-[0.85] animate-in fade-in slide-in-from-bottom-8 duration-1000">
+              <h1 className="text-7xl md:text-[9rem] font-black tracking-tight font-headline text-foreground leading-[0.85] animate-in fade-in slide-in-from-bottom-8 duration-1000">
                 Hire without <br />
                 <span className="text-primary italic opacity-90">friction.</span>
               </h1>
@@ -51,12 +51,12 @@ export default function Home() {
                 A transparent, dynamic recruitment engine that flows with your team's needs. AI matching meets liquid intelligence.
               </p>
               <div className="flex flex-col sm:flex-row gap-8 pt-10 w-full sm:w-auto animate-in fade-in slide-in-from-bottom-16 duration-1000">
-                <Button size="lg" className="h-20 px-16 rounded-full text-2xl font-black shadow-[0_20px_50px_rgba(255,51,102,0.4)] group bg-primary transition-all hover:scale-105 active:scale-95" asChild>
+                <Button size="lg" className="h-20 px-16 rounded-full text-2xl font-black shadow-[0_20px_50px_rgba(255,51,102,0.4)] group bg-primary transition-all hover:scale-105 active:scale-95 font-headline" asChild>
                   <Link href="/dashboard">
                     Enter Platform <ArrowRight className="ml-3 h-8 w-8 group-hover:translate-x-2 transition-transform" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="h-20 px-16 rounded-full text-2xl font-black glass-morphism border-none shadow-xl transition-all hover:scale-105 active:scale-95" asChild>
+                <Button size="lg" variant="outline" className="h-20 px-16 rounded-full text-2xl font-black glass-morphism border-none shadow-xl transition-all hover:scale-105 active:scale-95 font-headline" asChild>
                   <Link href="/candidate/portal">
                     For Talent
                   </Link>
@@ -98,35 +98,38 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="w-full py-40 bg-foreground text-background rounded-[5rem] mx-6 mb-16 shadow-[0_40px_100px_rgba(0,0,0,0.3)] relative overflow-hidden group">
-           <div className="absolute inset-0 bg-primary/10 opacity-30 group-hover:opacity-50 transition-opacity duration-1000" />
-           <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
-           
-           <div className="container px-8 mx-auto flex flex-col items-center text-center space-y-20 relative">
-              <h2 className="text-6xl md:text-9xl font-black font-headline max-w-5xl leading-[0.9] tracking-tighter">
-                Redefine your <br /> talent flow.
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-2xl w-full">
-                <Link href="/dashboard" className="w-full">
-                  <Button className="w-full h-20 rounded-full text-2xl font-black bg-background text-foreground hover:bg-white transition-all shadow-2xl hover:scale-105 active:scale-95">
-                    Launch HR
-                  </Button>
-                </Link>
-                <Link href="/candidate/portal" className="w-full">
-                  <Button variant="outline" className="w-full h-20 rounded-full text-2xl font-black border-white/20 hover:bg-white/10 text-white transition-all backdrop-blur-md">
-                    Join Portal
-                  </Button>
-                </Link>
-              </div>
-              <div className="flex flex-wrap justify-center gap-16 pt-10">
-                 {['Glass UI', 'Liquid Flows', 'Neural Match', 'Pure Speed'].map((text) => (
-                   <div key={text} className="flex items-center gap-4">
-                     <CheckCircle2 className="h-6 w-6 text-primary" />
-                     <span className="text-sm font-black uppercase tracking-[0.4em] opacity-80">{text}</span>
-                   </div>
-                 ))}
-              </div>
-           </div>
+        <section className="w-full py-40 px-4 md:px-0">
+          <div className="max-w-7xl mx-auto bg-foreground text-background rounded-[4rem] md:rounded-[6rem] p-16 md:p-32 relative overflow-hidden group shadow-[0_40px_100px_rgba(0,0,0,0.3)]">
+             <div className="absolute inset-0 bg-primary/20 opacity-30 group-hover:opacity-50 transition-opacity duration-1000" />
+             <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-primary/30 rounded-full blur-[120px] pointer-events-none animate-pulse" />
+             
+             <div className="flex flex-col items-center text-center space-y-16 relative z-10">
+                <h2 className="text-5xl md:text-8xl lg:text-9xl font-black font-headline max-w-6xl leading-[1] tracking-tight text-white drop-shadow-2xl">
+                  Redefine your <br className="hidden md:block" />
+                  <span className="text-primary italic">talent flow.</span>
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl w-full">
+                  <Link href="/dashboard" className="w-full">
+                    <Button className="w-full h-20 rounded-full text-2xl font-black bg-white text-foreground hover:bg-slate-100 transition-all shadow-2xl hover:scale-105 active:scale-95 font-headline">
+                      Launch HR
+                    </Button>
+                  </Link>
+                  <Link href="/candidate/portal" className="w-full">
+                    <Button variant="outline" className="w-full h-20 rounded-full text-2xl font-black border-white/20 hover:bg-white/10 text-white transition-all backdrop-blur-md font-headline">
+                      Join Portal
+                    </Button>
+                  </Link>
+                </div>
+                <div className="flex flex-wrap justify-center gap-12 md:gap-20 pt-10">
+                   {['Glass UI', 'Liquid Flows', 'Neural Match', 'Pure Speed'].map((text) => (
+                     <div key={text} className="flex items-center gap-4">
+                       <CheckCircle2 className="h-6 w-6 text-primary" />
+                       <span className="text-xs font-black uppercase tracking-[0.4em] opacity-90 text-white font-headline">{text}</span>
+                     </div>
+                   ))}
+                </div>
+             </div>
+          </div>
         </section>
       </main>
 
@@ -136,12 +139,12 @@ export default function Home() {
             <div className="bg-primary p-2.5 rounded-2xl text-white shadow-xl">
               <Heart className="h-6 w-6 fill-current" />
             </div>
-            <span className="font-black text-3xl tracking-tighter text-foreground">HireStack</span>
+            <span className="font-black text-3xl tracking-tighter text-foreground font-headline">HireStack</span>
           </div>
-          <p className="text-sm font-black text-muted-foreground uppercase tracking-[0.2em]">© 2025 Liquid HR Systems • Engineered with Love.</p>
+          <p className="text-sm font-black text-muted-foreground uppercase tracking-[0.2em] font-headline">© 2025 Liquid HR Systems • Engineered with Love.</p>
           <div className="flex gap-12">
             {['Terms', 'Privacy', 'Contact'].map(link => (
-              <Link key={link} className="text-sm font-black text-muted-foreground hover:text-primary transition-colors uppercase tracking-[0.3em]" href="#">{link}</Link>
+              <Link key={link} className="text-sm font-black text-muted-foreground hover:text-primary transition-colors uppercase tracking-[0.3em] font-headline" href="#">{link}</Link>
             ))}
           </div>
         </div>
