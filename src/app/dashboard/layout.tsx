@@ -1,3 +1,4 @@
+
 "use client"
 
 import { SidebarNav } from "@/components/dashboard/sidebar-nav";
@@ -16,13 +17,9 @@ export default function DashboardLayout({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-background relative overflow-hidden">
-      {/* Dynamic Background Blurs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent/20 rounded-full blur-[120px] pointer-events-none" />
-
+    <div className="flex h-screen bg-background relative overflow-hidden liquid-gradient">
       {/* Desktop Sidebar - Glass Component */}
-      <aside className="hidden lg:flex w-72 flex-col fixed inset-y-0 z-50 glass-morphism m-4 rounded-[2.5rem] overflow-hidden border-none">
+      <aside className="hidden lg:flex w-72 flex-col fixed inset-y-4 left-4 z-50 glass-morphism rounded-[2.5rem] overflow-hidden border-none shadow-2xl">
         <div className="h-24 flex items-center px-8 shrink-0">
           <Link href="/dashboard" className="flex items-center space-x-3">
             <div className="bg-primary p-2.5 rounded-2xl shadow-2xl shadow-primary/20">
@@ -31,7 +28,7 @@ export default function DashboardLayout({
             <span className="font-black text-2xl tracking-tighter font-headline text-foreground">HireStack</span>
           </Link>
         </div>
-        <div className="flex-1 overflow-y-auto py-6">
+        <div className="flex-1 overflow-y-auto py-6 scrollbar-hide">
           <SidebarNav />
         </div>
         <div className="p-6">
@@ -48,8 +45,8 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col lg:pl-80">
-        <header className="h-20 glass-morphism sticky top-4 z-40 mx-4 rounded-[2rem] flex items-center justify-between px-8 border-none transition-all duration-300">
+      <div className="flex-1 flex flex-col lg:pl-80 h-full overflow-y-auto scrollbar-hide">
+        <header className="h-20 glass-morphism sticky top-4 z-40 mx-4 rounded-[2rem] flex items-center justify-between px-8 border-none transition-all duration-300 shadow-xl shrink-0">
           <div className="flex items-center gap-6">
             {/* Mobile Menu Trigger */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -101,7 +98,7 @@ export default function DashboardLayout({
         </header>
 
         <main className="flex-1 p-4 md:p-8 lg:p-10 max-w-[1800px] mx-auto w-full">
-          <div className="glass-morphism-card rounded-[3rem] p-8 md:p-10 min-h-[calc(100vh-10rem)] border-none">
+          <div className="glass-morphism-card rounded-[3rem] p-8 md:p-10 min-h-full border-none shadow-2xl">
             {children}
           </div>
         </main>

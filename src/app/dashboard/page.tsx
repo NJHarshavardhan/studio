@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from "react";
@@ -117,7 +118,7 @@ export default function Dashboard() {
             variant="outline" 
             onClick={seedDemoData} 
             disabled={isSeeding}
-            className="rounded-2xl border-none glass-morphism hover:bg-white/50 dark:hover:bg-black/60 h-14 px-8 font-bold"
+            className="rounded-2xl border-none glass-morphism hover:bg-white/50 dark:hover:bg-black/60 h-14 px-8 font-bold shadow-xl"
           >
             {isSeeding ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Database className="h-4 w-4 mr-2" />}
             Initialize Demo
@@ -130,7 +131,7 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => (
-          <Card key={stat.title} className="glass-morphism border-none rounded-[2.5rem] overflow-hidden hover:scale-[1.02] transition-all duration-500 group">
+          <Card key={stat.title} className="glass-morphism border-none rounded-[2.5rem] overflow-hidden hover:scale-[1.02] transition-all duration-500 group shadow-xl">
             <CardContent className="p-8">
               <div className="flex items-center justify-between">
                 <div className={cn("p-4 rounded-[1.5rem] transition-transform group-hover:scale-110", stat.bg)}>
@@ -147,7 +148,7 @@ export default function Dashboard() {
                 )}
               </div>
               <div className="mt-8">
-                <h3 className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em]">{stat.title}</h3>
+                <h3 className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] font-headline">{stat.title}</h3>
                 {isLoading ? <Skeleton className="h-10 w-20 mt-2" /> : (
                   <p className="text-4xl font-black text-foreground mt-2 tabular-nums font-headline">
                     {stat.value}
@@ -160,7 +161,7 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card className="glass-morphism border-none rounded-[2.5rem] overflow-hidden p-2">
+        <Card className="glass-morphism border-none rounded-[2.5rem] overflow-hidden p-2 shadow-xl">
           <CardHeader className="pb-0 pt-8 px-8">
             <CardTitle className="text-2xl font-black text-foreground font-headline">Activity Flow</CardTitle>
             <CardDescription className="text-muted-foreground font-medium">Daily applications & technical throughput</CardDescription>
@@ -198,7 +199,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="glass-morphism border-none rounded-[2.5rem] overflow-hidden p-2">
+        <Card className="glass-morphism border-none rounded-[2.5rem] overflow-hidden p-2 shadow-xl">
           <CardHeader className="pb-0 pt-8 px-8">
             <CardTitle className="text-2xl font-black text-foreground font-headline">Session Volume</CardTitle>
             <CardDescription className="text-muted-foreground font-medium">AI Screening completion trends</CardDescription>
@@ -239,8 +240,8 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <Card className="lg:col-span-2 glass-morphism border-none rounded-[3rem] overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-10">
+        <Card className="lg:col-span-2 glass-morphism border-none rounded-[3rem] overflow-hidden shadow-2xl">
           <CardHeader className="p-10 border-b border-white/10">
             <CardTitle className="text-2xl font-black flex items-center gap-4 text-foreground font-headline">
                <Sparkles className="h-7 w-7 text-amber-500" /> Recent Talent Matches
@@ -268,7 +269,7 @@ export default function Dashboard() {
                     </div>
                     <div>
                       <p className="text-lg font-bold text-foreground group-hover:text-primary transition-colors font-headline">{report.name}</p>
-                      <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.15em] mt-1">{report.currentStage}</p>
+                      <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.15em] mt-1 font-headline">{report.currentStage}</p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -286,32 +287,32 @@ export default function Dashboard() {
         </Card>
 
         <div className="space-y-8">
-          <Card className="glass-morphism border-none rounded-[3rem] p-10">
+          <Card className="glass-morphism border-none rounded-[3rem] p-10 shadow-xl">
             <CardTitle className="text-xl font-black mb-8 text-foreground font-headline">Pipeline Actions</CardTitle>
             <div className="space-y-5">
                <Button 
                 variant="outline" 
-                className="w-full justify-start h-15 rounded-2xl group glass-morphism hover:bg-white/50 border-none transition-all px-6" 
+                className="w-full justify-start h-15 rounded-2xl group glass-morphism hover:bg-white/50 border-none transition-all px-6 shadow-sm" 
                 onClick={() => window.location.href='/dashboard/jobs'}
               >
                  <Briefcase className="h-5 w-5 mr-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
-                 <span className="font-bold text-foreground truncate text-base">Create Position</span>
+                 <span className="font-bold text-foreground truncate text-base font-headline">Create Position</span>
                </Button>
                <Button 
                 variant="outline" 
-                className="w-full justify-start h-15 rounded-2xl group glass-morphism hover:bg-white/50 border-none transition-all px-6" 
+                className="w-full justify-start h-15 rounded-2xl group glass-morphism hover:bg-white/50 border-none transition-all px-6 shadow-sm" 
                 onClick={() => window.location.href='/dashboard/screening'}
               >
                  <Bot className="h-5 w-5 mr-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
-                 <span className="font-bold text-foreground truncate text-base">AI Screening</span>
+                 <span className="font-bold text-foreground truncate text-base font-headline">AI Screening</span>
                </Button>
                <Button 
                 variant="outline" 
-                className="w-full justify-start h-15 rounded-2xl group glass-morphism hover:bg-white/50 border-none transition-all px-6" 
+                className="w-full justify-start h-15 rounded-2xl group glass-morphism hover:bg-white/50 border-none transition-all px-6 shadow-sm" 
                 onClick={() => window.location.href='/dashboard/analytics'}
               >
                  <PieChart className="h-5 w-5 mr-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
-                 <span className="font-bold text-foreground truncate text-base">Metrics</span>
+                 <span className="font-bold text-foreground truncate text-base font-headline">Metrics</span>
                </Button>
             </div>
           </Card>

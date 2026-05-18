@@ -1,15 +1,12 @@
+
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Bot, BarChart3, ShieldCheck, Sparkles, CheckCircle2, Heart } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-background relative overflow-hidden">
-      {/* Background Liquid Blurs */}
-      <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] bg-primary/15 rounded-full blur-[150px] animate-pulse pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-20%] w-[60%] h-[60%] bg-accent/20 rounded-full blur-[150px] animate-pulse pointer-events-none" />
-
-      <header className="px-8 lg:px-16 h-24 flex items-center justify-between sticky top-4 z-50 glass-morphism mx-4 rounded-[2.5rem] border-none transition-all duration-300">
+    <div className="flex flex-col min-h-screen bg-background relative overflow-x-hidden liquid-gradient">
+      <header className="px-8 lg:px-16 h-24 flex items-center justify-between sticky top-4 z-50 glass-morphism mx-4 rounded-[2.5rem] border-none transition-all duration-300 shadow-2xl">
         <Link className="flex items-center space-x-3.5" href="/">
           <div className="bg-primary p-2.5 rounded-2xl text-white shadow-2xl shadow-primary/20">
             <Heart className="h-7 w-7 fill-current" />
@@ -37,7 +34,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        <section className="w-full py-32 lg:py-56 relative overflow-hidden">
+        <section className="w-full py-32 lg:py-56 relative">
           <div className="container px-8 mx-auto relative">
             <div className="flex flex-col items-center text-center space-y-16 max-w-5xl mx-auto">
               <div className="inline-flex items-center gap-3 px-8 py-3 rounded-full glass-morphism text-primary text-[10px] font-black uppercase tracking-[0.4em] animate-in fade-in slide-in-from-bottom-4 duration-1000 border-none">
@@ -99,12 +96,11 @@ export default function Home() {
         </section>
 
         <section className="w-full py-40 px-4 md:px-0">
-          <div className="max-w-6xl mx-auto bg-foreground text-background rounded-[4rem] md:rounded-[5rem] p-16 md:p-24 relative overflow-hidden group shadow-[0_40px_100px_rgba(0,0,0,0.3)]">
+          <div className="max-w-6xl mx-auto glass-morphism-card rounded-[4rem] md:rounded-[5rem] p-16 md:p-24 relative overflow-hidden group shadow-2xl">
              <div className="absolute inset-0 bg-primary/20 opacity-30 group-hover:opacity-40 transition-opacity duration-1000" />
-             <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-primary/30 rounded-full blur-[120px] pointer-events-none animate-pulse" />
              
              <div className="flex flex-col items-center text-center space-y-12 relative z-10">
-                <h2 className="text-4xl md:text-7xl lg:text-8xl font-black font-headline max-w-5xl leading-[1] tracking-tight text-white drop-shadow-2xl">
+                <h2 className="text-4xl md:text-7xl lg:text-8xl font-black font-headline max-w-5xl leading-[1] tracking-tight text-foreground drop-shadow-2xl">
                   Redefine your <br className="hidden md:block" />
                   <span className="text-primary italic">talent flow.</span>
                 </h2>
@@ -115,7 +111,7 @@ export default function Home() {
                     </Button>
                   </Link>
                   <Link href="/candidate/portal" className="w-full">
-                    <Button variant="outline" className="w-full h-16 rounded-full text-xl font-black border-white/20 hover:bg-white/10 text-white transition-all backdrop-blur-md font-headline">
+                    <Button variant="outline" className="w-full h-16 rounded-full text-xl font-black border-white/20 hover:bg-white/10 text-foreground transition-all backdrop-blur-md font-headline">
                       Join Portal
                     </Button>
                   </Link>
@@ -124,7 +120,7 @@ export default function Home() {
                    {['Glass UI', 'Liquid Flows', 'Neural Match', 'Pure Speed'].map((text) => (
                      <div key={text} className="flex items-center gap-3">
                        <CheckCircle2 className="h-5 w-5 text-primary" />
-                       <span className="text-[10px] font-black uppercase tracking-[0.4em] opacity-90 text-white font-headline">{text}</span>
+                       <span className="text-[10px] font-black uppercase tracking-[0.4em] opacity-90 text-foreground font-headline">{text}</span>
                      </div>
                    ))}
                 </div>
@@ -133,7 +129,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="py-20 px-8 border-t border-white/10 glass-morphism mx-4 mb-4 rounded-[3rem] border-none">
+      <footer className="py-20 px-8 border-t border-white/10 glass-morphism mx-4 mb-4 rounded-[3rem] border-none shadow-2xl">
         <div className="container px-8 mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
           <div className="flex items-center space-x-3.5">
             <div className="bg-primary p-2.5 rounded-2xl text-white shadow-xl">
