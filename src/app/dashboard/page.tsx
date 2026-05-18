@@ -106,40 +106,40 @@ export default function Dashboard() {
   const isLoading = loadingAll || !firestore;
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground font-headline">Overview</h1>
-          <p className="text-muted-foreground mt-2 text-lg font-medium">Recruitment intelligence & pipeline health.</p>
+          <h1 className="text-4xl font-black tracking-tight text-foreground font-headline">Overview</h1>
+          <p className="text-muted-foreground mt-1.5 text-lg font-medium">Recruitment intelligence & pipeline health.</p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
            <Button 
             variant="outline" 
             onClick={seedDemoData} 
             disabled={isSeeding}
-            className="rounded-2xl border-white/40 dark:border-white/10 glass-morphism hover:bg-white/60 dark:hover:bg-black/60 h-14 px-8"
+            className="rounded-2xl border-none glass-morphism hover:bg-white/50 dark:hover:bg-black/60 h-14 px-8 font-bold"
           >
             {isSeeding ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Database className="h-4 w-4 mr-2" />}
-            Initialize Demo Data
+            Initialize Demo
           </Button>
-          <Button className="rounded-2xl shadow-[0_10px_30px_-5px_rgba(255,51,102,0.3)] bg-primary hover:bg-primary/90 h-14 px-8 font-black">
-             <Sparkles className="h-5 w-5 mr-2" /> AI Insights
+          <Button className="rounded-2xl shadow-xl shadow-primary/20 bg-primary hover:bg-primary/90 h-14 px-8 font-black">
+             <Sparkles className="h-4 w-4 mr-2" /> AI Insights
           </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => (
-          <Card key={stat.title} className="glass-morphism border-none rounded-[2rem] overflow-hidden hover:scale-[1.02] transition-all duration-500 group">
+          <Card key={stat.title} className="glass-morphism border-none rounded-[2.5rem] overflow-hidden hover:scale-[1.02] transition-all duration-500 group">
             <CardContent className="p-8">
               <div className="flex items-center justify-between">
                 <div className={cn("p-4 rounded-[1.5rem] transition-transform group-hover:scale-110", stat.bg)}>
-                  <stat.icon className={cn("h-7 w-7", stat.color)} />
+                  <stat.icon className={cn("h-6 w-6", stat.color)} />
                 </div>
-                {isLoading ? <Skeleton className="h-7 w-16 rounded-full" /> : (
+                {isLoading ? <Skeleton className="h-6 w-14 rounded-full" /> : (
                   <div className={cn(
-                    "flex items-center gap-1 text-xs font-black px-3 py-1.5 rounded-full backdrop-blur-md",
-                    stat.isUp ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" : "bg-red-500/20 text-red-600 dark:text-red-400"
+                    "flex items-center gap-1 text-[10px] font-black px-3 py-1 rounded-full backdrop-blur-md",
+                    stat.isUp ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "bg-red-500/15 text-red-600 dark:text-red-400"
                   )}>
                     {stat.isUp ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
                     {stat.trend}
@@ -147,8 +147,8 @@ export default function Dashboard() {
                 )}
               </div>
               <div className="mt-8">
-                <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em]">{stat.title}</h3>
-                {isLoading ? <Skeleton className="h-12 w-20 mt-2" /> : (
+                <h3 className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em]">{stat.title}</h3>
+                {isLoading ? <Skeleton className="h-10 w-20 mt-2" /> : (
                   <p className="text-4xl font-black text-foreground mt-2 tabular-nums font-headline">
                     {stat.value}
                   </p>
@@ -165,36 +165,33 @@ export default function Dashboard() {
             <CardTitle className="text-2xl font-black text-foreground font-headline">Activity Flow</CardTitle>
             <CardDescription className="text-muted-foreground font-medium">Daily applications & technical throughput</CardDescription>
           </CardHeader>
-          <CardContent className="h-[340px] mt-8 px-4">
+          <CardContent className="h-[320px] mt-8 px-4">
             {isLoading ? (
               <div className="w-full h-full flex flex-col gap-4 p-4">
                 <Skeleton className="w-full flex-1 rounded-3xl" />
-                <div className="flex justify-between">
-                   {[1,2,3,4,5,6,7].map(i => <Skeleton key={i} className="h-4 w-10" />)}
-                </div>
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={data}>
                   <defs>
                     <linearGradient id="colorFlow" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4}/>
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
                       <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border)/0.5)" />
-                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} dy={15} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border)/0.3)" />
+                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} dy={10} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} />
                   <Tooltip 
                     contentStyle={{ 
                       borderRadius: '24px', 
                       border: 'none', 
-                      backdropFilter: 'blur(20px)',
-                      backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                      boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)'
+                      backdropFilter: 'blur(16px)',
+                      backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                      boxShadow: '0 20px 40px -10px rgba(0,0,0,0.1)'
                     }}
                   />
-                  <Area type="monotone" dataKey="applications" stroke="hsl(var(--primary))" strokeWidth={5} fillOpacity={1} fill="url(#colorFlow)" />
+                  <Area type="monotone" dataKey="applications" stroke="hsl(var(--primary))" strokeWidth={4} fillOpacity={1} fill="url(#colorFlow)" />
                 </AreaChart>
               </ResponsiveContainer>
             )}
@@ -206,7 +203,7 @@ export default function Dashboard() {
             <CardTitle className="text-2xl font-black text-foreground font-headline">Session Volume</CardTitle>
             <CardDescription className="text-muted-foreground font-medium">AI Screening completion trends</CardDescription>
           </CardHeader>
-          <CardContent className="h-[340px] mt-8 px-4">
+          <CardContent className="h-[320px] mt-8 px-4">
              {isLoading ? (
               <div className="w-full h-full flex flex-col gap-4 p-4">
                 <div className="flex items-end justify-between flex-1 gap-4">
@@ -218,26 +215,23 @@ export default function Dashboard() {
                     />
                    ))}
                 </div>
-                <div className="flex justify-between">
-                   {[1,2,3,4,5,6,7].map(i => <Skeleton key={i} className="h-4 w-10" />)}
-                </div>
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border)/0.5)" />
-                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} dy={15} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border)/0.3)" />
+                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} dy={10} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} />
                   <Tooltip 
                     contentStyle={{ 
                       borderRadius: '24px', 
                       border: 'none', 
-                      backdropFilter: 'blur(20px)',
-                      backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                      boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)'
+                      backdropFilter: 'blur(16px)',
+                      backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                      boxShadow: '0 20px 40px -10px rgba(0,0,0,0.1)'
                     }}
                   />
-                  <Bar dataKey="interviews" fill="hsl(var(--primary))" radius={[16, 16, 0, 0]} barSize={54} />
+                  <Bar dataKey="interviews" fill="hsl(var(--primary))" radius={[12, 12, 0, 0]} barSize={48} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -255,30 +249,26 @@ export default function Dashboard() {
           <CardContent className="p-0">
             <div className="divide-y divide-white/10">
               {loadingRecent ? (
-                Array.from({ length: 4 }).map((_, i) => (
+                Array.from({ length: 3 }).map((_, i) => (
                   <div key={i} className="flex items-center justify-between p-10">
                     <div className="flex items-center gap-6">
-                      <Skeleton className="h-16 w-16 rounded-2xl" />
-                      <div className="space-y-4">
-                        <Skeleton className="h-6 w-48" />
-                        <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-14 w-14 rounded-2xl" />
+                      <div className="space-y-3">
+                        <Skeleton className="h-5 w-40" />
+                        <Skeleton className="h-3 w-24" />
                       </div>
-                    </div>
-                    <div className="text-right space-y-4">
-                      <Skeleton className="h-10 w-16 ml-auto" />
-                      <Skeleton className="h-4 w-36 ml-auto" />
                     </div>
                   </div>
                 ))
               ) : recentCandidates?.map((report: any) => (
-                <div key={report.id} className="flex items-center justify-between p-10 hover:bg-white/40 dark:hover:bg-black/40 transition-all group cursor-pointer">
+                <div key={report.id} className="flex items-center justify-between p-10 hover:bg-white/20 dark:hover:bg-black/30 transition-all group cursor-pointer">
                   <div className="flex items-center gap-6">
-                    <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center font-black text-primary text-3xl border border-primary/20 shadow-xl group-hover:scale-105 transition-transform">
+                    <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center font-black text-primary text-2xl border border-primary/20 shadow-xl group-hover:scale-105 transition-transform">
                       {report.name ? report.name[0] : 'C'}
                     </div>
                     <div>
-                      <p className="text-xl font-bold text-foreground group-hover:text-primary transition-colors font-headline">{report.name}</p>
-                      <p className="text-[11px] text-muted-foreground font-black uppercase tracking-[0.2em] mt-1">{report.currentStage}</p>
+                      <p className="text-lg font-bold text-foreground group-hover:text-primary transition-colors font-headline">{report.name}</p>
+                      <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.15em] mt-1">{report.currentStage}</p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -287,9 +277,6 @@ export default function Dashboard() {
                       report.matchScore > 80 ? "text-emerald-500" : report.matchScore > 60 ? "text-amber-500" : "text-red-500"
                     )}>
                       {report.matchScore}%
-                    </div>
-                    <div className="text-[10px] text-muted-foreground flex items-center justify-end gap-2 font-black uppercase tracking-[0.1em] mt-2">
-                      <Clock className="h-4 w-4" /> {report.appliedDate ? new Date(report.appliedDate).toLocaleDateString() : 'N/A'}
                     </div>
                   </div>
                 </div>
@@ -300,45 +287,45 @@ export default function Dashboard() {
 
         <div className="space-y-8">
           <Card className="glass-morphism border-none rounded-[3rem] p-10">
-            <CardTitle className="text-2xl font-black mb-10 text-foreground font-headline">Pipeline Actions</CardTitle>
-            <div className="space-y-6">
+            <CardTitle className="text-xl font-black mb-8 text-foreground font-headline">Pipeline Actions</CardTitle>
+            <div className="space-y-5">
                <Button 
                 variant="outline" 
-                className="w-full justify-start h-16 rounded-2xl group border-white/40 dark:border-white/10 glass-morphism hover:bg-white/60 dark:hover:bg-black/60 transition-all px-6 border-none" 
+                className="w-full justify-start h-15 rounded-2xl group glass-morphism hover:bg-white/50 border-none transition-all px-6" 
                 onClick={() => window.location.href='/dashboard/jobs'}
               >
-                 <Briefcase className="h-6 w-6 mr-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
-                 <span className="font-bold text-foreground truncate text-lg">Create New Position</span>
+                 <Briefcase className="h-5 w-5 mr-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
+                 <span className="font-bold text-foreground truncate text-base">Create Position</span>
                </Button>
                <Button 
                 variant="outline" 
-                className="w-full justify-start h-16 rounded-2xl group border-white/40 dark:border-white/10 glass-morphism hover:bg-white/60 dark:hover:bg-black/60 transition-all px-6 border-none" 
+                className="w-full justify-start h-15 rounded-2xl group glass-morphism hover:bg-white/50 border-none transition-all px-6" 
                 onClick={() => window.location.href='/dashboard/screening'}
               >
-                 <Bot className="h-6 w-6 mr-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
-                 <span className="font-bold text-foreground truncate text-lg">Start AI Screening</span>
+                 <Bot className="h-5 w-5 mr-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
+                 <span className="font-bold text-foreground truncate text-base">AI Screening</span>
                </Button>
                <Button 
                 variant="outline" 
-                className="w-full justify-start h-16 rounded-2xl group border-white/40 dark:border-white/10 glass-morphism hover:bg-white/60 dark:hover:bg-black/60 transition-all px-6 border-none" 
+                className="w-full justify-start h-15 rounded-2xl group glass-morphism hover:bg-white/50 border-none transition-all px-6" 
                 onClick={() => window.location.href='/dashboard/analytics'}
               >
-                 <PieChart className="h-6 w-6 mr-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
-                 <span className="font-bold text-foreground truncate text-lg">Detailed Metrics</span>
+                 <PieChart className="h-5 w-5 mr-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" /> 
+                 <span className="font-bold text-foreground truncate text-base">Metrics</span>
                </Button>
             </div>
           </Card>
 
-          <Card className="border-none shadow-[0_20px_50px_rgba(255,51,102,0.2)] rounded-[3rem] bg-primary p-10 text-primary-foreground relative overflow-hidden group">
-             <div className="absolute -top-10 -right-10 h-64 w-64 bg-white/20 rounded-full blur-[80px] group-hover:scale-125 transition-transform duration-1000" />
-             <div className="flex items-center gap-5 mb-8 relative">
-                <div className="p-4 bg-white/20 rounded-[1.5rem] shadow-inner backdrop-blur-md">
-                   <Sparkles className="h-7 w-7" />
+          <Card className="border-none shadow-2xl shadow-primary/20 rounded-[3rem] bg-primary p-10 text-primary-foreground relative overflow-hidden group">
+             <div className="absolute -top-10 -right-10 h-64 w-64 bg-white/10 rounded-full blur-[80px] group-hover:scale-110 transition-transform duration-1000" />
+             <div className="flex items-center gap-4 mb-6 relative">
+                <div className="p-3 bg-white/15 rounded-[1.25rem] backdrop-blur-md">
+                   <Sparkles className="h-6 w-6" />
                 </div>
-                <h3 className="font-black text-2xl font-headline">AI Pro Tip</h3>
+                <h3 className="font-black text-xl font-headline">AI Pro Tip</h3>
              </div>
-             <p className="text-base opacity-95 leading-relaxed font-bold relative">
-               Candidates with a match score above 85% are 3x more likely to reach final rounds. Use the AI Interviewer to validate their soft skills early in the funnel.
+             <p className="text-sm opacity-95 leading-relaxed font-bold relative">
+               Candidates with a match score above 85% are 3x more likely to reach final rounds. Use the AI Interviewer to validate their soft skills early.
              </p>
           </Card>
         </div>

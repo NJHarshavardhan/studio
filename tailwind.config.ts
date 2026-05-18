@@ -10,8 +10,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Outfit', 'sans-serif'],
-        headline: ['Space Grotesk', 'sans-serif'],
+        body: ['Inter', 'sans-serif'],
+        headline: ['Plus Jakarta Sans', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
