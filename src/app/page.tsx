@@ -43,7 +43,7 @@ export default function Home() {
               <div className="inline-flex items-center gap-3 px-8 py-3 rounded-full glass-morphism text-primary text-[10px] font-black uppercase tracking-[0.4em] animate-in fade-in slide-in-from-bottom-4 duration-1000">
                 <Sparkles className="h-4 w-4" /> The Future of Liquid HR
               </div>
-              <h1 className="text-7xl md:text-[9rem] font-black tracking-tight font-headline text-foreground leading-[0.85] animate-in fade-in slide-in-from-bottom-8 duration-1000">
+              <h1 className="text-7xl md:text-[9rem] font-black tracking-tight font-headline text-foreground leading-[0.85] animate-in fade-in slide-in-from-bottom-8 duration-1000 drop-shadow-sm">
                 Hire without <br />
                 <span className="text-primary italic opacity-90">friction.</span>
               </h1>
@@ -104,7 +104,7 @@ export default function Home() {
              <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-primary/30 rounded-full blur-[120px] pointer-events-none animate-pulse" />
              
              <div className="flex flex-col items-center text-center space-y-16 relative z-10">
-                <h2 className="text-5xl md:text-8xl lg:text-9xl font-black font-headline max-w-6xl leading-[1] tracking-tight text-white drop-shadow-2xl">
+                <h2 className="text-5xl md:text-8xl lg:text-9xl font-black font-headline max-w-6xl leading-[1.1] tracking-tight text-white drop-shadow-2xl">
                   Redefine your <br className="hidden md:block" />
                   <span className="text-primary italic">talent flow.</span>
                 </h2>

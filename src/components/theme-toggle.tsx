@@ -12,9 +12,11 @@ export function ThemeToggle() {
     if (savedTheme) {
       setTheme(savedTheme)
       document.documentElement.classList.toggle("dark", savedTheme === "dark")
-    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setTheme("dark")
-      document.documentElement.classList.add("dark")
+    } else {
+      // Default to light as requested
+      setTheme("light")
+      document.documentElement.classList.remove("dark")
+      localStorage.setItem("theme", "light")
     }
   }, [])
 
@@ -26,11 +28,11 @@ export function ThemeToggle() {
   }
 
   return (
-    <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full w-9 h-9">
+    <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full w-10 h-10 glass-morphism border-none hover:bg-white/60">
       {theme === "light" ? (
-        <Sun className="h-4 w-4 text-amber-500" />
+        <Sun className="h-5 w-5 text-primary" />
       ) : (
-        <Moon className="h-4 w-4 text-blue-400" />
+        <Moon className="h-5 w-5 text-blue-400" />
       )}
       <span className="sr-only">Toggle theme</span>
     </Button>
